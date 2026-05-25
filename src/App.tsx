@@ -86,12 +86,32 @@ export default function App() {
     const handleUrlRouting = () => {
       const pathname = window.location.pathname;
       const hash = window.location.hash;
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryView = urlParams.get("view");
       
-      if (pathname === "/admin" || hash === "#/admin" || hash === "#admin" || hash === "/admin/") {
+      if (
+        pathname === "/admin" || 
+        pathname === "/admin/" || 
+        hash === "#/admin" || 
+        hash === "#admin" || 
+        queryView === "admin"
+      ) {
         setView("admin");
-      } else if (pathname === "/gallery" || hash === "#/gallery" || hash === "#gallery" || hash === "/gallery/") {
+      } else if (
+        pathname === "/gallery" || 
+        pathname === "/gallery/" || 
+        hash === "#/gallery" || 
+        hash === "#gallery" || 
+        queryView === "gallery"
+      ) {
         setView("gallery");
-      } else if (pathname === "/contact" || hash === "#/contact" || hash === "#contact" || hash === "/contact/") {
+      } else if (
+        pathname === "/contact" || 
+        pathname === "/contact/" || 
+        hash === "#/contact" || 
+        hash === "#contact" || 
+        queryView === "contact"
+      ) {
         setView("contact");
       } else {
         setView("home");
@@ -362,6 +382,12 @@ export default function App() {
               >
                 WhatsApp
               </a>
+              <button 
+                onClick={() => navigateToRoute("admin")}
+                className="hover:text-indigo-400 text-slate-500 transition-colors flex items-center gap-1 cursor-pointer font-bold bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-lg hover:border-indigo-500/25 transition-all text-[11px]"
+              >
+                🔐 Admin Console
+              </button>
             </div>
           </div>
 
