@@ -382,12 +382,7 @@ export default function App() {
               >
                 WhatsApp
               </a>
-              <button 
-                onClick={() => navigateToRoute("admin")}
-                className="hover:text-indigo-400 text-slate-500 transition-colors flex items-center gap-1 cursor-pointer font-bold bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-lg hover:border-indigo-500/25 transition-all text-[11px]"
-              >
-                🔐 Admin Console
-              </button>
+              
             </div>
           </div>
 
