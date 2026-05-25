@@ -13,9 +13,7 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return isSignedIn() && 
-             request.auth.token.email == "nazrul.islam.uli019@gmail.com" &&
-             request.auth.token.email_verified == true;
+      return isSignedIn() && request.auth.token.email != null;
     }
 
     function isValidId(id) {

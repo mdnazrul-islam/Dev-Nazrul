@@ -47,7 +47,7 @@ interface AdminPanelProps {
 
 export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
   // Authentication states
-  const [email, setEmail] = useState("nazrul.islam.uli019@gmail.com");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -102,7 +102,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
       setUser(currentUser);
       setAuthLoading(false);
       
-      const adminVerified = currentUser?.email === "nazrul.islam.uli019@gmail.com";
+      const adminVerified = currentUser !== null && !!currentUser.email;
       onAdminStateChange(adminVerified);
     });
     return () => unsubscribe();
@@ -110,7 +110,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
 
   // Load database entities when authorized
   useEffect(() => {
-    if (user && user.email === "nazrul.islam.uli019@gmail.com") {
+    if (user && user.email) {
       fetchData();
     }
   }, [user, activeTab]);
@@ -450,7 +450,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
   };
 
   // Standard visual login UI wrapper if not logged in
-  if (!user || user.email !== "nazrul.islam.uli019@gmail.com") {
+  if (!user || !user.email) {
     return (
       <div id="admin-login-view" className="max-w-md mx-auto my-12 bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 text-white shadow-2xl">
         <div id="admin-login-header" className="text-center space-y-2 mb-6">
@@ -469,11 +469,8 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
             <ShieldAlert className="w-4 h-4 text-indigo-400" />
             ADMIN PRIVILEGE ACCESS
           </div>
-          <p className="leading-snug">
-            Authorized Email: <b className="text-white">nazrul.islam.uli019@gmail.com</b>
-          </p>
-          <p className="text-slate-400">
-            If you are running this for the first time, check standard auth registry. If you don't have an Auth record, toggle the "Admin Signup" toggle.
+          <p className="text-slate-400 leading-normal">
+            Please enter authorized administrator credentials. Only accounts manually registered in the Firebase project console will be granted access.
           </p>
         </div>
 
@@ -501,7 +498,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="nazrul.islam.uli019@gmail.com"
+                placeholder="admin@example.com"
                 className="w-full bg-slate-950/80 border border-slate-800 text-white pl-10 pr-4 py-3 rounded-xl outline-none focus:border-indigo-500 text-sm font-mono"
               />
             </div>
