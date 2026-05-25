@@ -24,6 +24,23 @@ import {
   Trash2, Edit, Loader2, UploadCloud, CheckCircle, RefreshCcw, LogOut, Check, ChevronDown
 } from "lucide-react";
 
+const getSafeLocalStorage = (key: string, defaultValue: string): string => {
+  try {
+    return localStorage.getItem(key) || defaultValue;
+  } catch (e) {
+    console.warn("Storage reading blocked in iframe sandbox settings:", e);
+    return defaultValue;
+  }
+};
+
+const setSafeLocalStorage = (key: string, value: string): void => {
+  try {
+    localStorage.setItem(key, value);
+  } catch (e) {
+    console.warn("Storage writing blocked in iframe sandbox settings:", e);
+  }
+};
+
 interface AdminPanelProps {
   onAdminStateChange: (isAdminLoggedIn: boolean) => void;
 }
@@ -38,8 +55,8 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
   const [successMsg, setSuccessMsg] = useState("");
 
   // Cloudinary Local Settings
-  const [cloudName, setCloudName] = useState(() => localStorage.getItem("cloudinary_cloud_name") || "ddtf1d2yk");
-  const [uploadPreset, setUploadPreset] = useState(() => localStorage.getItem("cloudinary_upload_preset") || "portfolio_preset");
+  const [cloudName, setCloudName] = useState(() => getSafeLocalStorage("cloudinary_cloud_name", "ddtf1d2yk"));
+  const [uploadPreset, setUploadPreset] = useState(() => getSafeLocalStorage("cloudinary_upload_preset", "portfolio_preset"));
 
   // Admin section views: "projects" | "add" | "messages" | "settings"
   const [activeTab, setActiveTab] = useState<"projects" | "add" | "messages" | "settings">("projects");
@@ -193,8 +210,8 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
       const responseUrl = await uploadToCloudinary(testFile, cloudName, uploadPreset);
 
       // Saves to LocalStorage only if upload succeeds
-      localStorage.setItem("cloudinary_cloud_name", cloudName);
-      localStorage.setItem("cloudinary_upload_preset", uploadPreset);
+      setSafeLocalStorage("cloudinary_cloud_name", cloudName);
+      setSafeLocalStorage("cloudinary_upload_preset", uploadPreset);
 
       setDbSuccess(`Cloudinary verification successful! Variables saved. (Test asset URL: ${responseUrl})`);
       setTimeout(() => setDbSuccess(""), 6000);

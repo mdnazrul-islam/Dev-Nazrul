@@ -117,8 +117,14 @@ export default function App() {
     setActiveProject(null);
 
     const targetPath = newView === "home" ? "/" : `/${newView}`;
-    if (window.location.pathname !== targetPath) {
-      window.history.pushState({ view: newView }, "", targetPath);
+    try {
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState({ view: newView }, "", targetPath);
+      }
+    } catch (e) {
+      console.warn("pushState blocked by security restrictions in iframe:", e);
+      // Fallback: update the URL hash to support seamless routing in iframe bounds
+      window.location.hash = `#/${newView}`;
     }
   };
 
