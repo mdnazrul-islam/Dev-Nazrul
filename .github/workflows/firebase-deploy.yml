@@ -1,32 +1,26 @@
-name: Deploy to Firebase Hosting on Merge
+name: Deploy to Firebase Hosting
 on:
   push:
     branches:
-      - main
-      - master
+      - main  # আপনার মেইন ব্রাঞ্চের নাম যদি master হয় তবে এখানে master লিখবেন
+
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/home/setup-node@v4
-        with:
-          node-size: 20
-          cache: 'npm'
+      - name: Install dependencies
+        run: npm install
 
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Build Application
+      - name: Build project
         run: npm run build
 
-      - name: Deploy to Firebase Hosting
+      - name: Deploy to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEV_NAZRUL }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_TOKEN }}' # আমরা যেটা সেভ করেছি
           channelId: live
-          projectId: dev-nazrul
+          projectId: dev-nazrul # আপনার ফায়ারবেস প্রোজেক্ট আইডি
