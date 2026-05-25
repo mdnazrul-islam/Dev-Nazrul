@@ -171,13 +171,39 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
     }
   };
 
-  // Persists Cloudinary values directly to LocalStorage
-  const handleSettingsSave = (e: React.FormEvent) => {
+  // Persists Cloudinary values directly to LocalStorage after live API verification
+  const handleSettingsSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    localStorage.setItem("cloudinary_cloud_name", cloudName);
-    localStorage.setItem("cloudinary_upload_preset", uploadPreset);
-    setDbSuccess("Cloudinary configurations saved successfully.");
-    setTimeout(() => setDbSuccess(""), 3000);
+    setDbLoading(true);
+    setDbError("");
+    setDbSuccess("");
+
+    try {
+      // Create a tiny 1x1 transparent GIF file to test the upload
+      const binaryString = window.atob("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      const testBlob = new Blob([bytes], { type: "image/gif" });
+      const testFile = new File([testBlob], "test_verify.gif", { type: "image/gif" });
+
+      // Attempt test upload to Cloudinary API
+      const responseUrl = await uploadToCloudinary(testFile, cloudName, uploadPreset);
+
+      // Saves to LocalStorage only if upload succeeds
+      localStorage.setItem("cloudinary_cloud_name", cloudName);
+      localStorage.setItem("cloudinary_upload_preset", uploadPreset);
+
+      setDbSuccess(`Cloudinary verification successful! Variables saved. (Test asset URL: ${responseUrl})`);
+      setTimeout(() => setDbSuccess(""), 6000);
+    } catch (err: any) {
+      console.error("Cloudinary connection test failed", err);
+      setDbError(`Verification failed: ${err.message || "Unknown error"}. Please check your Cloud Name and make sure the Upload Preset exists and is configured as 'Unsigned' in your Cloudinary Dashboard.`);
+    } finally {
+      setDbLoading(false);
+    }
   };
 
   // Local image attachment trigger
@@ -1048,44 +1074,106 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
 
       {/* Tab: CDN Configuration Settings manager */}
       {activeTab === "settings" && (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6">
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-8 animate-fade-in">
           <div className="border-b border-slate-850 pb-4">
             <h4 className="font-sans font-extrabold text-xl text-white">Cloudinary CDN Settings</h4>
-            <p className="text-slate-450 text-xs font-mono mt-1">
+            <p className="text-slate-400 text-xs font-mono mt-1">
               Customize storage variables below for smooth background media streaming and layouts.
             </p>
           </div>
 
-          <form onSubmit={handleSettingsSave} className="space-y-5 max-w-xl">
-            <div>
-              <label className="block text-xs uppercase font-mono tracking-wider font-bold text-slate-400 mb-1.5 font-bold">Cloud Name</label>
-              <input
-                type="text"
-                value={cloudName}
-                onChange={(e) => setCloudName(e.target.value)}
-                required
-                className="w-full bg-slate-950 border border-slate-800 text-indigo-300 rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-sm font-mono"
-              />
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            {/* Form Section */}
+            <form onSubmit={handleSettingsSave} className="space-y-6">
+              <div>
+                <label className="block text-xs uppercase font-mono tracking-wider font-bold text-slate-400 mb-1.5 flex items-center justify-between">
+                  <span>Cloud Name</span>
+                  <span className="text-[10px] text-indigo-400 font-normal">e.g. ddtf1d2yk</span>
+                </label>
+                <input
+                  type="text"
+                  value={cloudName}
+                  onChange={(e) => setCloudName(e.target.value)}
+                  required
+                  placeholder="Enter Cloudinary API Cloud Name"
+                  className="w-full bg-slate-950 border border-slate-800 text-indigo-300 rounded-xl py-3.5 px-4 outline-none focus:border-indigo-500 text-sm font-mono transition-all"
+                />
+              </div>
 
-            <div>
-              <label className="block text-xs uppercase font-mono tracking-wider font-bold text-slate-400 mb-1.5 font-bold">Unsigned Upload Preset</label>
-              <input
-                type="text"
-                value={uploadPreset}
-                onChange={(e) => setUploadPreset(e.target.value)}
-                required
-                className="w-full bg-slate-950 border border-slate-800 text-indigo-300 rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-sm font-mono"
-              />
-            </div>
+              <div>
+                <label className="block text-xs uppercase font-mono tracking-wider font-bold text-slate-400 mb-1.5 flex items-center justify-between">
+                  <span>Unsigned Upload Preset</span>
+                  <span className="text-[10px] text-indigo-400 font-normal">e.g. portfolio_preset</span>
+                </label>
+                <input
+                  type="text"
+                  value={uploadPreset}
+                  onChange={(e) => setUploadPreset(e.target.value)}
+                  required
+                  placeholder="Enter Unsigned Preset Name"
+                  className="w-full bg-slate-950 border border-slate-800 text-indigo-300 rounded-xl py-3.5 px-4 outline-none focus:border-indigo-500 text-sm font-mono transition-all"
+                />
+              </div>
 
-            <button
-              type="submit"
-              className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-3.5 rounded-xl shadow-lg transition-all text-xs tracking-wider uppercase font-mono cursor-pointer"
-            >
-              Verify & Save Variables
-            </button>
-          </form>
+              <button
+                type="submit"
+                disabled={dbLoading}
+                className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:bg-slate-800 text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-indigo-500/10 transition-all text-xs tracking-wider uppercase font-mono cursor-pointer flex items-center justify-center gap-2"
+              >
+                {dbLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                    <span>Verifying Credentials...</span>
+                  </>
+                ) : (
+                  <span>Verify & Save Variables</span>
+                )}
+              </button>
+            </form>
+
+            {/* Instruction Segment */}
+            <div className="bg-slate-950/65 border border-slate-850 rounded-2xl p-5 sm:p-6 space-y-4">
+              <span className="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider text-amber-400">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+                কিভাবে configure করবেন? (Preset Setup Guide)
+              </span>
+
+              <div className="space-y-3.5 font-sans text-xs leading-relaxed text-slate-350">
+                <p className="font-bold text-slate-200">
+                  Cloudinary তে Upload Preset না থাকলে ছবি আপলোড কাজ করবে না। নিচে দেওয়া স্টেপগুলো ফলো করে সম্পূর্ণ ফ্রীতে একটি Unsigned Preset তৈরি করে নিন:
+                </p>
+
+                <ol className="list-decimal pl-4.5 space-y-2.5 text-slate-400 text-[11px] font-mono whitespace-normal">
+                  <li>
+                    <strong className="text-white">Cloudinary Dashboard</strong> এ লগইন করুন এবং বাম পাশের নিচে থাকা <strong className="text-indigo-400">Settings Gear (icon)</strong> এ ক্লিক করুন।
+                  </li>
+                  <li>
+                    বাম পাশের ট্যাব থেকে <strong className="text-white">Upload</strong> সিলেক্ট করুন।
+                  </li>
+                  <li>
+                    একটু নিচে স্ক্রল করে <strong className="text-white">Upload presets</strong> সেকশন খুঁজুন এবং <strong className="text-indigo-400">"Add upload preset"</strong> বাটনে ক্লিক করুন।
+                  </li>
+                  <li>
+                    নতুন পেজে <strong className="text-white">Signing Mode</strong> ড্রপডাউনটি <strong className="text-rose-400 border border-rose-500/20 px-1 py-0.5 rounded bg-rose-500/5 font-sans font-bold">Unsigned</strong> এ পরিবর্তন করুন (এটা সবচেয়ে গুরুত্বপূর্ণ step!)।
+                  </li>
+                  <li>
+                    সেখানে তৈরি হওয়া <strong className="text-white">Upload preset name</strong>-টি কপি করে নিন (যেমন: <code className="text-indigo-300">portfolio_preset</code>)।
+                  </li>
+                  <li>
+                    সবশেষে একদম উপরে ডান কোণায় থাকা <strong className="text-white">"Save" (হলুদ বাটন)</strong> এ ক্লিক করুন।
+                  </li>
+                  <li>
+                    এখন আপনার Cloud Name এবং কপি করা Upload Preset Name-টি এখানে দিয়ে <strong className="text-indigo-400">Verify & Save Variables</strong> বাটনে চাপুন।
+                  </li>
+                </ol>
+
+                <div className="border-t border-slate-850 pt-3 text-[10.5px] text-slate-500 font-mono leading-normal">
+                  <span className="text-indigo-400 block font-bold mb-1">PRO-TIP:</span>
+                  আমাদের এই Verify বাটনটি আপনার দেওয়া Credentials লাইভ চেক করার জন্য একটি 1x1 Transparent GIF ফাইল আপলোড টেস্ট করে নিশ্চিত করবে। টেস্ট সফল হলে তবেই API variables সেভ হবে!
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
