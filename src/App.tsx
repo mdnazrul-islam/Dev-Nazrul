@@ -1,0 +1,333 @@
+import React, { useState, useEffect } from "react";
+import { collection, query, orderBy, getDocs } from "firebase/firestore";
+import { db, handleFirestoreError, OperationType } from "./firebase";
+import { Project } from "./types";
+import Navbar from "./components/Navbar";
+import Hero from "./components/Hero";
+import ProjectCard from "./components/ProjectCard";
+import ProjectDetailView from "./components/ProjectDetailView";
+import ContactForm from "./components/ContactForm";
+import AdminPanel from "./components/AdminPanel";
+import { Laptop, Briefcase, Phone, Settings, ShieldAlert, Cpu, Heart, Code, Sparkles, MapPin, Layers, Loader2 } from "lucide-react";
+
+export default function App() {
+  const [currentView, setView] = useState<string>("home");
+  const [activeProject, setActiveProject] = useState<Project | null>(null);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(false);
+  
+  const [databaseProjects, setDatabaseProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Baseline templates as fallbacks if the Firestore database is empty or loading
+  const baselineTemplateProjects: Project[] = [
+    {
+      id: "baseline-1",
+      title: "Tele-Health Care Systems",
+      description: "A comprehensive telemedicine web application featuring real-time calendar appointment slots booking, face-to-face secure encrypted peer video channels, responsive analytics trackers, and integrated prescription PDF invoices creation.",
+      category: "Web",
+      techStack: ["Next.js", "Firebase Firestore", "WebRTC", "Cloudinary Hosting", "Tailwind CSS"],
+      imageUrl: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&auto=format&fit=crop&q=80",
+      videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      liveLink: "https://dev-nazrul.firebaseapp.com",
+      guide: "1. Fork repository\n2. Setup Environment keys: CLOUDINARY_API_KEY, FIREBASE_DB_SECRET\n3. Run 'npm install'\n4. Invoke 'npm run dev' to boot dev server on localhost:3000.",
+      versionLogs: [
+        { version: "1.0.2", date: "2026-05-12", changes: ["Added encrypted WebRTC tunnels", "Optimized mobile layouts"] },
+        { version: "1.0.0", date: "2026-04-20", changes: ["Initial baseline rollout"] }
+      ],
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      id: "baseline-2",
+      title: "Android Smart Agronomy Monitor",
+      description: "Sleek IoT powered android application. Features direct Bluetooth low energy (BLE) soil conductivity sensors pairing, automated regional weather warning logs, offline local SQLite backups sync, and automatic PDF crop diagnosis dispatching.",
+      category: "App",
+      techStack: ["React Native", "Android SDK", "Node.js Helpers", "Cloudinary Storage", "Tailwind CSS"],
+      imageUrl: "https://images.unsplash.com/photo-1518173946687-a4c8a383392e?w=800&auto=format&fit=crop&q=80",
+      apkLink: "https://dev-nazrul.firebaseapp.com/downloads/smart_agronomy.apk",
+      guide: "1. Download Android APK file from download portal\n2. Allow 'Install from Unknown Sources' in system settings\n3. Start telemetry pairing.",
+      versionLogs: [
+        { version: "1.1.0", date: "2026-05-24", changes: ["Upgraded BLE pairing speed by 40%", "Integrated Push alert triggers"] }
+      ],
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  ];
+
+  // Fetch real-time projects from cloud Firestore database
+  const getProjectsFromCloud = async () => {
+    setIsLoading(true);
+    try {
+      const projCollection = collection(db, "projects");
+      const projQuery = query(projCollection, orderBy("createdAt", "desc"));
+      const querySnapshot = await getDocs(projQuery);
+      
+      const loaded: Project[] = [];
+      querySnapshot.forEach((docSnap) => {
+        loaded.push({ id: docSnap.id, ...docSnap.data() } as Project);
+      });
+      
+      setDatabaseProjects(loaded);
+    } catch (err) {
+      console.warn("Could not query FireStore projects securely. Using local showcase templates instead.", err);
+      // Reporting error inside compliant format
+      try {
+        handleFirestoreError(err, OperationType.LIST, "projects");
+      } catch (e) {
+        // Suppress message popups so client falls back beautifully.
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getProjectsFromCloud();
+  }, [currentView]);
+
+  // Combined source: combines standard Firestore rows with templates for a full catalog
+  const allProjects = databaseProjects.length > 0 ? databaseProjects : baselineTemplateProjects;
+
+  // Selected Filter settings
+  const [galleryFilter, setGalleryFilter] = useState<"All" | "Web" | "App">("All");
+
+  const filteredProjects = galleryFilter === "All" 
+    ? allProjects 
+    : allProjects.filter(p => p.category === galleryFilter);
+
+  // Transition helper navigation overrides
+  const handleExploreTrigger = () => {
+    setView("gallery");
+    setGalleryFilter("All");
+    setActiveProject(null);
+    window.scrollTo({ top: 300, behavior: "smooth" });
+  };
+
+  const handleContactTrigger = () => {
+    setView("contact");
+    setActiveProject(null);
+  };
+
+  return (
+    <div id="app-root-container" className="min-h-screen bg-slate-950 text-white flex flex-col justify-between selection:bg-indigo-600/30">
+      
+      {/* Complete Header Bar */}
+      <Navbar 
+        currentView={currentView} 
+        setView={(v) => {
+          setView(v);
+          setActiveProject(null);
+        }} 
+        isAdmin={isAdminLoggedIn}
+        onLogout={() => {
+          setIsAdminLoggedIn(false);
+          setView("home");
+        }}
+      />
+
+      {/* Primary Routing Body */}
+      <main className="flex-grow">
+        
+        {/* Dynamic Project Detail Page overlay (Shown if clicking any card) */}
+        {activeProject ? (
+          <ProjectDetailView 
+            project={activeProject} 
+            onBack={() => setActiveProject(null)} 
+          />
+        ) : (
+          <>
+            {/* View: Homepage Layout */}
+            {currentView === "home" && (
+              <div id="home-view" className="space-y-16 animate-fade-in pb-16">
+                <Hero 
+                  onExploreProjects={handleExploreTrigger}
+                  onContactMe={handleContactTrigger}
+                />
+
+                {/* Featured Products Grid */}
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                  <div className="text-center md:text-left space-y-1">
+                    <span className="text-[10px] uppercase font-mono tracking-wider text-indigo-400 font-extrabold">Professional Showcase</span>
+                    <h2 className="font-sans font-extrabold text-2xl sm:text-3xl tracking-tight text-white">Featured Builds</h2>
+                    <p className="text-sm text-slate-400 max-w-xl font-sans">
+                      A list of top hand-tailored web services and native apps compiled for production runtime.
+                    </p>
+                  </div>
+
+                  {isLoading ? (
+                    <div className="flex flex-col items-center justify-center py-12">
+                      <Cpu className="w-8 h-8 text-indigo-500 animate-spin mb-3" />
+                      <p className="text-xs font-mono text-slate-400">Querying active cloud bucket...</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {allProjects.slice(0, 3).map((project) => (
+                        <ProjectCard 
+                          key={project.id || project.title} 
+                          project={project} 
+                          onSelection={(p) => setActiveProject(p)} 
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="text-center pt-4">
+                    <button
+                      onClick={handleExploreTrigger}
+                      className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-indigo-400 font-semibold px-6 py-3 rounded-xl border border-slate-800 transition-all text-xs tracking-wide uppercase font-mono cursor-pointer"
+                    >
+                      <Layers className="w-4 h-4" />
+                      Browse Full Projects Gallery ({allProjects.length})
+                    </button>
+                  </div>
+                </div>
+
+                {/* Quick Info Credentials banner */}
+                <div className="bg-slate-900/40 border-y border-slate-800 py-12">
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8 text-center sm:text-left">
+                    <div className="p-4 space-y-2">
+                      <Code className="w-6 h-6 text-indigo-400 mx-auto sm:mx-0" />
+                      <h4 className="text-base font-bold text-slate-200">Zero-Trust Security</h4>
+                      <p className="text-xs text-slate-400 leading-normal font-sans">
+                        Backend operations are locked down using bulletproof Attribute-Based Access Control security rules.
+                      </p>
+                    </div>
+                    <div className="p-4 space-y-2">
+                      <Sparkles className="w-6 h-6 text-amber-400 mx-auto sm:mx-0" />
+                      <h4 className="text-base font-bold text-slate-200">Cloudinary Sync</h4>
+                      <p className="text-xs text-slate-400 leading-normal font-sans">
+                        Static assets, APK codes, mockups, and layout images stream directly from professional Unsigned presets.
+                      </p>
+                    </div>
+                    <div className="p-4 space-y-2">
+                      <MapPin className="w-6 h-6 text-emerald-400 mx-auto sm:mx-0" />
+                      <h4 className="text-base font-bold text-slate-200">Engineering Quality</h4>
+                      <p className="text-xs text-slate-400 leading-normal font-sans">
+                        Coded modularly in TypeScript with direct real-time communication modules connecting to Firestore.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* View: Project Gallery View with dynamic category tab toggles */}
+            {currentView === "gallery" && (
+              <div id="gallery-view" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 animate-fade-in">
+                <div className="text-center space-y-2">
+                  <h2 className="font-sans font-extrabold text-3xl sm:text-4xl text-white tracking-tight">Project Hub</h2>
+                  <p className="text-sm text-slate-400 max-w-xl mx-auto">
+                    Browse and inspect live running links or download secure APK bundles directly. Use toggles below to narrow down your search.
+                  </p>
+                </div>
+
+                {/* Filters Toggle Header Bar */}
+                <div className="flex justify-center gap-1.5 p-1 bg-slate-900/60 border border-slate-800 rounded-xl max-w-sm mx-auto">
+                  {(["All", "Web", "App"] as const).map((filter) => (
+                    <button
+                      key={filter}
+                      id={`filter-tab-${filter}`}
+                      onClick={() => setGalleryFilter(filter)}
+                      className={`flex-1 py-2 rounded-lg text-xs font-mono font-bold uppercase transition-all tracking-wide cursor-pointer ${
+                        galleryFilter === filter
+                          ? "bg-indigo-600 text-white shadow"
+                          : "text-slate-450 hover:text-slate-200"
+                      }`}
+                    >
+                      {filter}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Grid list display */}
+                {isLoading ? (
+                  <div className="text-center py-20">
+                    <Loader2 className="w-8 h-8 animate-spin text-indigo-400 mx-auto mb-2" />
+                    <p className="text-xs font-mono text-slate-450">Querying portfolio assets...</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
+                    {filteredProjects.map((project) => (
+                      <ProjectCard 
+                        key={project.id || project.title} 
+                        project={project} 
+                        onSelection={(p) => setActiveProject(p)} 
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* View: Interactive Feedback Form Portal */}
+            {currentView === "contact" && (
+              <div id="contact-view" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 animate-fade-in">
+                <ContactForm />
+              </div>
+            )}
+
+            {/* View: Firebase Audited Admin Control Panel */}
+            {currentView === "admin" && (
+              <div id="admin-view" className="py-2 animate-fade-in">
+                <AdminPanel onAdminStateChange={(loggedIn) => setIsAdminLoggedIn(loggedIn)} />
+              </div>
+            )}
+          </>
+        )}
+
+      </main>
+
+      {/* Complete Footer Section with Nazrul's Authentic Metadata */}
+      <footer id="app-footer" className="bg-slate-950 border-t border-slate-900 py-10 text-xs sm:text-sm text-slate-500 font-mono">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            
+            <div className="space-y-1.5">
+              <span className="font-sans font-bold text-white text-base block leading-none">Md. Nazrul Islam</span>
+              <p className="text-xs text-slate-400 block font-sans">Full-stack Software & Android Developer</p>
+              <p className="text-[10px] text-slate-505 block leading-normal pt-1 break-all max-w-sm">
+                Inquiries: <a href="mailto:nazrul.islam.uli019@gmail.com" className="text-indigo-400 hover:underline">nazrul.islam.uli019@gmail.com</a>
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+              <span className="text-[10px] text-slate-505 uppercase block">Direct Links:</span>
+              <a 
+                href="https://www.facebook.com/4nazrul.islam" 
+                target="_blank" 
+                rel="noreferrer" 
+                className="hover:text-indigo-400 transition-colors"
+              >
+                Facebook
+              </a>
+              <a 
+                href="https://www.linkedin.com/in/md-nazrul-islam-482722411" 
+                target="_blank" 
+                rel="noreferrer" 
+                className="hover:text-indigo-400 transition-colors"
+              >
+                LinkedIn
+              </a>
+              <a 
+                href="https://wa.me/8801793840762" 
+                target="_blank" 
+                rel="noreferrer" 
+                className="hover:text-emerald-400 transition-colors flex items-center gap-1"
+              >
+                WhatsApp
+              </a>
+            </div>
+          </div>
+
+          <div className="mt-8 pt-6 border-t border-slate-900/40 text-center flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-[11px] text-slate-600">
+            <p>© {new Date().getFullYear()} Md. Nazrul Islam. All rights reserved.</p>
+            <p className="flex items-center justify-center gap-1 font-sans">
+              Designed with <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" /> & synced to Cloud Firestore.
+            </p>
+          </div>
+        </div>
+      </footer>
+
+    </div>
+  );
+}
