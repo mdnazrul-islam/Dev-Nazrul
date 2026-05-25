@@ -1,5 +1,5 @@
 import React from "react";
-import { Sparkles, Terminal } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 interface StylishLogoProps {
   size?: "sm" | "lg";
@@ -11,15 +11,15 @@ export default function StylishLogo({ size = "sm" }: StylishLogoProps) {
       <div id="stylish-logo-large" className="flex flex-col items-center justify-center text-center space-y-3 cursor-pointer select-none group">
         <div className="relative">
           {/* Ambient Glowing Aura */}
-          <div className="absolute -inset-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 rounded-2xl blur-lg opacity-70 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+          <div className="absolute -inset-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 rounded-3xl blur-lg opacity-70 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
           
-          <div className="relative w-20 h-20 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center text-3xl font-black text-white shadow-2xl">
-            <span className="bg-gradient-to-tr from-indigo-400 via-purple-400 to-cyan-300 bg-clip-text text-transparent italic tracking-wider font-mono">
-              DN
-            </span>
-            <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg bg-indigo-600 border border-slate-950 flex items-center justify-center">
-              <Terminal className="w-3.5 h-3.5 text-white" />
-            </div>
+          <div className="relative w-24 h-24 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center shadow-2xl overflow-hidden p-0.5">
+            <img 
+              src="/logo.png" 
+              alt="Dev Nazrul Logo" 
+              referrerPolicy="no-referrer"
+              className="w-full h-full object-cover rounded-2xl"
+            />
           </div>
         </div>
         
@@ -41,11 +41,14 @@ export default function StylishLogo({ size = "sm" }: StylishLogoProps) {
   return (
     <div id="stylish-logo-small" className="flex items-center gap-3 cursor-pointer select-none group">
       <div className="relative">
-        <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 rounded-lg blur-sm opacity-40 group-hover:opacity-90 transition duration-350"></div>
-        <div className="relative w-10 h-10 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center font-black text-base text-white">
-          <span className="bg-gradient-to-tr from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent italic tracking-tight font-mono">
-            DN
-          </span>
+        <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 rounded-xl blur-sm opacity-40 group-hover:opacity-90 transition duration-350"></div>
+        <div className="relative w-10 h-10 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center overflow-hidden">
+          <img 
+            src="/logo.png" 
+            alt="Dev Nazrul Logo" 
+            referrerPolicy="no-referrer"
+            className="w-full h-full object-cover"
+          />
         </div>
       </div>
       <div className="flex flex-col">
