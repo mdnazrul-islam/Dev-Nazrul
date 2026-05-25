@@ -1,6 +1,6 @@
 {
-  "name": "Portfolio & Admin Portal",
-  "description": "A customized fully reactive Full-stack Portfolio and secure Admin Panel utilizing Firebase Auth, Cloud Firestore, and direct Cloudinary image uploads.",
+  "name": "Dev Nazrul",
+  "description": "Professional Full-Stack Developer & Android Expert Portfolio with real-time Cloud Firestore integration and secure CDN controls.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

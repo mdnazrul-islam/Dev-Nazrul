@@ -81,6 +81,47 @@ export default function App() {
     }
   };
 
+  // Listen to browser URL path changes (and hash triggers) to load requested views dynamically
+  useEffect(() => {
+    const handleUrlRouting = () => {
+      const pathname = window.location.pathname;
+      const hash = window.location.hash;
+      
+      if (pathname === "/admin" || hash === "#/admin" || hash === "#admin" || hash === "/admin/") {
+        setView("admin");
+      } else if (pathname === "/gallery" || hash === "#/gallery" || hash === "#gallery" || hash === "/gallery/") {
+        setView("gallery");
+      } else if (pathname === "/contact" || hash === "#/contact" || hash === "#contact" || hash === "/contact/") {
+        setView("contact");
+      } else {
+        setView("home");
+      }
+    };
+
+    // Initialize on page load
+    handleUrlRouting();
+
+    // Listen to browser history buttons (fwd/back) or manual hash mutations
+    window.addEventListener("popstate", handleUrlRouting);
+    window.addEventListener("hashchange", handleUrlRouting);
+
+    return () => {
+      window.removeEventListener("popstate", handleUrlRouting);
+      window.removeEventListener("hashchange", handleUrlRouting);
+    };
+  }, []);
+
+  // Update URL history synchronously when clicking on-screen links without reloading the page
+  const navigateToRoute = (newView: string) => {
+    setView(newView);
+    setActiveProject(null);
+
+    const targetPath = newView === "home" ? "/" : `/${newView}`;
+    if (window.location.pathname !== targetPath) {
+      window.history.pushState({ view: newView }, "", targetPath);
+    }
+  };
+
   useEffect(() => {
     getProjectsFromCloud();
   }, [currentView]);
@@ -97,14 +138,14 @@ export default function App() {
 
   // Transition helper navigation overrides
   const handleExploreTrigger = () => {
-    setView("gallery");
+    navigateToRoute("gallery");
     setGalleryFilter("All");
     setActiveProject(null);
     window.scrollTo({ top: 300, behavior: "smooth" });
   };
 
   const handleContactTrigger = () => {
-    setView("contact");
+    navigateToRoute("contact");
     setActiveProject(null);
   };
 
@@ -115,13 +156,12 @@ export default function App() {
       <Navbar 
         currentView={currentView} 
         setView={(v) => {
-          setView(v);
-          setActiveProject(null);
+          navigateToRoute(v);
         }} 
         isAdmin={isAdminLoggedIn}
         onLogout={() => {
           setIsAdminLoggedIn(false);
-          setView("home");
+          navigateToRoute("home");
         }}
       />
 

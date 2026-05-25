@@ -32,7 +32,6 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
   // Authentication states
   const [email, setEmail] = useState("nazrul.islam.uli019@gmail.com");
   const [password, setPassword] = useState("");
-  const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [authError, setAuthError] = useState("");
@@ -149,14 +148,8 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
     }
 
     try {
-      if (isRegisterMode) {
-        // Creates account if first-time project builder setup
-        await createUserWithEmailAndPassword(auth, email, password);
-        setSuccessMsg("Administrator account created successfully! Signing in...");
-        setIsRegisterMode(false);
-      } else {
-        await signInWithEmailAndPassword(auth, email, password);
-      }
+      await signInWithEmailAndPassword(auth, email, password);
+      setSuccessMsg("Logged in successfully as Admin!");
     } catch (err: any) {
       console.error("Auth Fail:", err);
       setAuthError(err?.message || "Invalid credentials or Firebase configuration error.");
@@ -187,27 +180,20 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
     setTimeout(() => setDbSuccess(""), 3000);
   };
 
-  // Direct Unsigned Trigger to Cloudinary Upload
-  const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Local image attachment trigger
+  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
     const file = files[0];
     setImageFile(file);
-    setUploadingImage(true);
     setDbError("");
 
-    try {
-      const secureUrl = await uploadToCloudinary(file, cloudName, uploadPreset);
-      setProjectForm((prev) => ({ ...prev, imageUrl: secureUrl }));
-      setDbSuccess("Image uploaded successfully and direct secure link returned!");
-      setTimeout(() => setDbSuccess(""), 4000);
-    } catch (err: any) {
-      console.error("Asset upload failure", err);
-      setDbError(`Cloudinary Failed: ${err.message || "Ensure Cloud name & portfolio_preset is unsigned"}`);
-    } finally {
-      setUploadingImage(false);
-    }
+    // Create a local blob object URL for instant, gorgeous image previews prior to upload
+    const localPreviewUrl = URL.createObjectURL(file);
+    setProjectForm((prev) => ({ ...prev, imageUrl: localPreviewUrl }));
+    setDbSuccess("Image attached locally! It will upload to Cloudinary automatically on publish.");
+    setTimeout(() => setDbSuccess(""), 4050);
   };
 
   // Form Field change
@@ -218,15 +204,40 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
     });
   };
 
-  // Save Project (Add New / Update Existing)
+  // Save Project (Add New / Update Existing) with automatic Cloudinary upload built-in
   const handleProjectSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setDbLoading(true);
     setDbError("");
     setDbSuccess("");
 
-    if (!projectForm.title || !projectForm.description || !projectForm.imageUrl) {
-      setDbError("Title, Description, and Cloudinary showcase image URL are required.");
+    if (!projectForm.title || !projectForm.description) {
+      setDbError("Title and description details are required.");
+      setDbLoading(false);
+      return;
+    }
+
+    let finalImageUrl = projectForm.imageUrl;
+
+    // Check if an image is locally attached and needs background Cloudinary uploading
+    if (imageFile) {
+      setUploadingImage(true);
+      try {
+        const secureUrl = await uploadToCloudinary(imageFile, cloudName, uploadPreset);
+        finalImageUrl = secureUrl;
+      } catch (err: any) {
+        console.error("Asset upload failure on commit", err);
+        setDbError(`Cloudinary Upload Failed: ${err.message || "Please verify your credentials under settings."}`);
+        setDbLoading(false);
+        setUploadingImage(false);
+        return;
+      } finally {
+        setUploadingImage(false);
+      }
+    }
+
+    if (!finalImageUrl) {
+      setDbError("A showcase image or attachment is required to publish.");
       setDbLoading(false);
       return;
     }
@@ -240,7 +251,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
       description: projectForm.description,
       category: projectForm.category,
       techStack: techArray,
-      imageUrl: projectForm.imageUrl,
+      imageUrl: finalImageUrl,
       videoUrl: projectForm.videoUrl || null,
       liveLink: projectForm.category === "Web" ? (projectForm.liveLink || null) : null,
       apkLink: projectForm.category === "App" ? (projectForm.apkLink || null) : null,
@@ -477,22 +488,11 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
           >
             {authLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
-            ) : isRegisterMode ? (
-              "Initialize Admin Signup"
             ) : (
               "Login to Panel"
             )}
           </button>
         </form>
-
-        <div className="mt-6 text-center border-t border-slate-800/80 pt-4">
-          <button
-            onClick={() => setIsRegisterMode(!isRegisterMode)}
-            className="text-xs text-indigo-400 hover:underline font-mono"
-          >
-            {isRegisterMode ? "Switch to standard Admin Login" : "No Auth Record? Register Admin Account"}
-          </button>
-        </div>
       </div>
     );
   }
@@ -837,17 +837,17 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
 
               {/* CLOUDINARY FILE UPLOAD SEGMENT */}
               <div className="md:col-span-2 bg-slate-950 p-5 rounded-2xl border border-slate-850 space-y-4">
-                <span className="block text-xs uppercase font-mono tracking-wider font-bold text-indigo-400 mb-1 font-bold">
-                  Direct Cloudinary Asset Uploader
+                <span className="block text-xs uppercase font-mono tracking-wider font-bold text-indigo-400 mb-1">
+                  Automatic Cloudinary Showcase Image Uploader
                 </span>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                   
                   {/* File trigger drag area */}
                   <label className="border-2 border-dashed border-slate-800 hover:border-indigo-500/30 rounded-xl p-6 text-center cursor-pointer block bg-slate-900/60 hover:bg-slate-900 transition-all">
-                    <UploadCloud className="w-8 h-8 text-slate-500 mx-auto mb-2" />
-                    <span className="text-xs text-slate-350 block font-bold">Select showcase image file</span>
-                    <span className="text-[10px] text-slate-500 block font-mono mt-0.5">Loads directly to Cloudinary: {cloudName}</span>
+                    <UploadCloud className="w-8 h-8 text-indigo-400 mx-auto mb-2" />
+                    <span className="text-xs text-slate-300 block font-bold">Attach project showcase image</span>
+                    <span className="text-[10px] text-indigo-400 block font-mono mt-1">Uploads automatically on posting</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -857,31 +857,57 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                     />
                   </label>
 
-                  {/* Showcase or load link fields manually */}
+                  {/* Showcase or preview area with live local rendering */}
                   <div className="space-y-3">
-                    <label className="block text-xs font-mono font-bold uppercase tracking-wider text-slate-505">
-                      Cloudinary Image URL
+                    <label className="block text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
+                      Showcase Image Preview
                     </label>
-                    <input
-                      type="url"
-                      name="imageUrl"
-                      value={projectForm.imageUrl}
-                      onChange={handleFormChange}
-                      placeholder="https://res.cloudinary.com/..."
-                      required
-                      className="w-full bg-slate-900 border border-slate-800 py-3 px-4 text-xs font-mono outline-none rounded-xl text-indigo-300 focus:border-indigo-500"
-                    />
+                    
+                    {projectForm.imageUrl ? (
+                      <div className="relative group rounded-xl overflow-hidden border border-slate-800 bg-slate-900 h-32 flex items-center justify-center">
+                        <img 
+                          src={projectForm.imageUrl} 
+                          alt="Showcase preview" 
+                          referrerPolicy="no-referrer"
+                          className="max-h-full max-w-full object-contain"
+                        />
+                        <div className="absolute inset-0 bg-slate-950/70 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all text-center p-2">
+                          <span className="text-[10px] text-white font-mono uppercase bg-indigo-650 border border-indigo-500/20 px-2 py-1 rounded">
+                            {imageFile ? "Pending Cloudinary Upload" : "Existing URL Active"}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="rounded-xl border border-dashed border-slate-800 bg-slate-900/40 h-32 flex items-center justify-center text-xs text-slate-500 font-mono">
+                        No image selected yet
+                      </div>
+                    )}
+
                     {uploadingImage && (
                       <div className="flex items-center gap-2 text-xs font-mono text-indigo-400">
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        Uploading directly to CDN cloud bucket...
+                        Uploading to Cloudinary CDN...
                       </div>
                     )}
+
                     {imageFile && !uploadingImage && (
-                      <div className="text-[10px] text-slate-505 font-mono">
-                        Selected Asset: {imageFile.name} ({(imageFile.size / 1024).toFixed(1)} KB)
+                      <div className="text-[10px] text-indigo-300 font-mono flex items-center gap-1 bg-indigo-950/20 px-2 py-1.5 rounded border border-indigo-900/30">
+                        <Check className="w-3 h-3 text-emerald-400" />
+                        Selected raw file: {imageFile.name} ({(imageFile.size / 1024).toFixed(1)} KB)
                       </div>
                     )}
+
+                    <div className="pt-2">
+                      <span className="text-[10px] text-slate-505 block mb-1 font-mono uppercase">Or paste manual image URL</span>
+                      <input
+                        type="url"
+                        name="imageUrl"
+                        value={projectForm.imageUrl}
+                        onChange={handleFormChange}
+                        placeholder="https://res.cloudinary.com/..."
+                        className="w-full bg-slate-900 border border-slate-850 py-2.5 px-3.5 text-xs font-mono outline-none rounded-xl text-slate-300 focus:border-indigo-500"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

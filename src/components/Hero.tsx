@@ -1,4 +1,5 @@
 import { Phone, Mail, Linkedin, Facebook, ArrowUpRight, Github } from "lucide-react";
+import StylishLogo from "./StylishLogo";
 
 interface HeroProps {
   onExploreProjects: () => void;
@@ -27,20 +28,25 @@ export default function Hero({ onExploreProjects, onContactMe }: HeroProps) {
         <div className="text-center md:text-left md:flex md:items-center md:justify-between gap-12">
           
           <div className="md:w-3/5 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-xs font-mono tracking-wide">
-              <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
-              AVAILABLE FOR FULLSTACK CLIENT APPS
+            <div className="flex flex-col sm:flex-row items-center md:items-start xl:items-center gap-6">
+              <div className="flex-shrink-0">
+                <StylishLogo size="lg" />
+              </div>
+              <div className="space-y-3 text-center sm:text-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-xs font-mono tracking-wide">
+                  <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
+                  AVAILABLE FOR PROFESSIONAL PROJECTS
+                </div>
+                <h1 className="font-sans font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-none bg-gradient-to-r from-white via-indigo-155 to-indigo-400 bg-clip-text text-transparent">
+                  Dev Nazrul
+                </h1>
+                <p className="font-sans text-xl text-indigo-455 font-bold tracking-wide">
+                  Professional Full-stack Developer & Technical Engineer
+                </p>
+              </div>
             </div>
 
-            <h1 className="font-sans font-extrabold text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-none text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-indigo-300">
-              Md. Nazrul Islam
-            </h1>
-
-            <p className="font-sans text-xl text-indigo-400 font-semibold tracking-wide">
-              Professional Full-stack Developer & Technical Engineer
-            </p>
-
-            <p className="font-sans text-slate-400 text-base sm:text-lg max-w-2xl leading-relaxed">
+            <p className="font-sans text-slate-400 text-base sm:text-lg max-w-2xl leading-relaxed pt-2">
               Highly passionate about crafting state-of-the-art secure single-page operations, high-performance dashboard analytics web apps, and native android application packages (APKs) with complex Cloud storage and database automations. Let's engineer your concepts.
             </p>
 

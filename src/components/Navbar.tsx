@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Menu, X, ShieldAlert, Laptop, Briefcase, Phone, ChevronRight } from "lucide-react";
+import StylishLogo from "./StylishLogo";
 
 interface NavbarProps {
   currentView: string;
@@ -22,14 +23,8 @@ export default function Navbar({ currentView, setView, isAdmin, onLogout }: Navb
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo Brand */}
-          <div className="flex-shrink-0 flex items-center gap-2 cursor-pointer" onClick={() => setView("home")}>
-            <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20">
-              DN
-            </div>
-            <div className="hidden sm:block">
-              <span className="font-sans font-bold text-lg tracking-tight text-white block leading-tight">Dev Nazrul</span>
-              <span className="font-mono text-[10px] text-indigo-400 block tracking-widest uppercase">Fullstack Portfolio</span>
-            </div>
+          <div className="flex-shrink-0 cursor-pointer" onClick={() => setView("home")}>
+            <StylishLogo size="sm" />
           </div>
 
           {/* Desktop Navigation */}
@@ -57,27 +52,30 @@ export default function Navbar({ currentView, setView, isAdmin, onLogout }: Navb
               );
             })}
 
-            <div className="h-6 w-px bg-slate-800 mx-3" />
-
-            {/* Admin trigger */}
-            <button
-              onClick={() => setView("admin")}
-              id="nav-item-admin"
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                currentView === "admin"
-                  ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/25"
-                  : "bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700"
-              }`}
-            >
-              <ShieldAlert className="w-4 h-4" />
-              {isAdmin ? "Admin Panel" : "Login"}
-            </button>
+            {/* Admin toggle shown ONLY if user is already logged in or visiting admin directly */}
+            {(isAdmin || currentView === "admin") && (
+              <>
+                <div className="h-6 w-px bg-slate-800 mx-3" />
+                <button
+                  onClick={() => setView("admin")}
+                  id="nav-item-admin"
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    currentView === "admin"
+                      ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/25"
+                      : "bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700"
+                  }`}
+                >
+                  <ShieldAlert className="w-4 h-4" />
+                  {isAdmin ? "Admin Panel" : "Login"}
+                </button>
+              </>
+            )}
 
             {isAdmin && (
               <button
                 onClick={onLogout}
                 id="nav-item-logout"
-                className="ml-2 text-xs text-rose-400 hover:text-rose-300 hover:underline px-2 py-1"
+                className="ml-2 text-xs text-rose-450 hover:text-rose-300 hover:underline px-2 py-1 transition-all"
               >
                 Logout
               </button>
@@ -130,25 +128,29 @@ export default function Navbar({ currentView, setView, isAdmin, onLogout }: Navb
               </button>
             );
           })}
-          <div className="h-px bg-slate-800 my-2" />
-          <button
-            onClick={() => {
-              setView("admin");
-              setIsOpen(false);
-            }}
-            id="mobile-nav-item-admin"
-            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-base font-medium transition-all ${
-              currentView === "admin"
-                ? "bg-indigo-600 text-white"
-                : "bg-slate-800/50 hover:bg-slate-800 text-slate-200 border border-slate-800"
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <ShieldAlert className="w-5 h-5 text-indigo-400" />
-              <span>{isAdmin ? "Admin Panel" : "Admin Login"}</span>
-            </div>
-            <ChevronRight className="w-4 h-4 opacity-50" />
-          </button>
+          {(isAdmin || currentView === "admin") && (
+            <>
+              <div className="h-px bg-slate-800 my-2" />
+              <button
+                onClick={() => {
+                  setView("admin");
+                  setIsOpen(false);
+                }}
+                id="mobile-nav-item-admin"
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-base font-medium transition-all ${
+                  currentView === "admin"
+                    ? "bg-indigo-600 text-white"
+                    : "bg-slate-800/50 hover:bg-slate-800 text-slate-200 border border-slate-800"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <ShieldAlert className="w-5 h-5 text-indigo-400" />
+                  <span>{isAdmin ? "Admin Panel" : "Admin Login"}</span>
+                </div>
+                <ChevronRight className="w-4 h-4 opacity-50" />
+              </button>
+            </>
+          )}
           {isAdmin && (
             <button
               onClick={() => {
