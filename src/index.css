@@ -1,1 +1,190 @@
 @import "tailwindcss";
+
+:root {
+  --theme-bg: #020617;
+  --theme-text-primary: #f8fafc;
+  --theme-text-secondary: #94a3b8;
+  --theme-card: rgba(15, 23, 42, 0.55);
+  --theme-border: rgba(30, 41, 59, 0.7);
+  --theme-accent: #6366f1;
+  --theme-accent-hover: #4f46e5;
+  --theme-accent-raw: 99, 102, 241;
+  --theme-nav-bg: rgba(15, 23, 42, 0.85);
+}
+
+/* Light theme values */
+[data-theme="light"] {
+  --theme-bg: #f8fafc;
+  --theme-text-primary: #0f172a;
+  --theme-text-secondary: #475569;
+  --theme-card: rgba(255, 255, 255, 0.85);
+  --theme-border: rgba(203, 213, 225, 0.8);
+  --theme-accent: #4f46e5;
+  --theme-accent-hover: #4338ca;
+  --theme-accent-raw: 79, 70, 229;
+  --theme-nav-bg: rgba(255, 255, 255, 0.9);
+}
+
+/* Fruit-based themes */
+[data-theme="apple"] {
+  --theme-bg: #1c0507;
+  --theme-text-primary: #fff1f2;
+  --theme-text-secondary: #fda4af;
+  --theme-card: rgba(45, 10, 15, 0.6);
+  --theme-border: rgba(225, 29, 72, 0.4);
+  --theme-accent: #e11d48;
+  --theme-accent-hover: #f43f5e;
+  --theme-accent-raw: 225, 29, 72;
+  --theme-nav-bg: rgba(28, 5, 7, 0.85);
+}
+
+[data-theme="pineapple"] {
+  --theme-bg: #1c1402;
+  --theme-text-primary: #fef9c3;
+  --theme-text-secondary: #fde047;
+  --theme-card: rgba(50, 40, 5, 0.6);
+  --theme-border: rgba(202, 138, 4, 0.4);
+  --theme-accent: #eab308;
+  --theme-accent-hover: #facc15;
+  --theme-accent-raw: 234, 179, 8;
+  --theme-nav-bg: rgba(28, 20, 2, 0.85);
+}
+
+[data-theme="mango"] {
+  --theme-bg: #221004;
+  --theme-text-primary: #ffedd5;
+  --theme-text-secondary: #fdba74;
+  --theme-card: rgba(54, 25, 6, 0.6);
+  --theme-border: rgba(249, 115, 22, 0.4);
+  --theme-accent: #f97316;
+  --theme-accent-hover: #ff8e3c;
+  --theme-accent-raw: 249, 115, 22;
+  --theme-nav-bg: rgba(34, 16, 4, 0.85);
+}
+
+[data-theme="strawberry"] {
+  --theme-bg: #1f030f;
+  --theme-text-primary: #ffe4e6;
+  --theme-text-secondary: #f472b6;
+  --theme-card: rgba(45, 5, 22, 0.6);
+  --theme-border: rgba(219, 39, 119, 0.4);
+  --theme-accent: #db2777;
+  --theme-accent-hover: #ec4899;
+  --theme-accent-raw: 219, 39, 119;
+  --theme-nav-bg: rgba(31, 3, 15, 0.85);
+}
+
+[data-theme="banana"] {
+  --theme-bg: #1c1c04;
+  --theme-text-primary: #fefcbf;
+  --theme-text-secondary: #fde047;
+  --theme-card: rgba(45, 45, 10, 0.6);
+  --theme-border: rgba(234, 179, 8, 0.4);
+  --theme-accent: #d97706;
+  --theme-accent-hover: #f59e0b;
+  --theme-accent-raw: 217, 119, 6;
+  --theme-nav-bg: rgba(28, 28, 4, 0.85);
+}
+
+[data-theme="green mango"] {
+  --theme-bg: #051c0d;
+  --theme-text-primary: #d1fae5;
+  --theme-text-secondary: #6ee7b7;
+  --theme-card: rgba(6, 40, 18, 0.6);
+  --theme-border: rgba(16, 185, 129, 0.4);
+  --theme-accent: #10b981;
+  --theme-accent-hover: #34d399;
+  --theme-accent-raw: 16, 185, 129;
+  --theme-nav-bg: rgba(5, 28, 13, 0.85);
+}
+
+[data-theme="orange"] {
+  --theme-bg: #240c03;
+  --theme-text-primary: #ffedd5;
+  --theme-text-secondary: #fb923c;
+  --theme-card: rgba(55, 20, 5, 0.6);
+  --theme-border: rgba(249, 115, 22, 0.4);
+  --theme-accent: #f97316;
+  --theme-accent-hover: #fa8a34;
+  --theme-accent-raw: 249, 115, 22;
+  --theme-nav-bg: rgba(36, 12, 3, 0.85);
+}
+
+[data-theme="cherry"] {
+  --theme-bg: #1c020a;
+  --theme-text-primary: #ffe4e6;
+  --theme-text-secondary: #fb7185;
+  --theme-card: rgba(45, 5, 15, 0.6);
+  --theme-border: rgba(225, 29, 72, 0.4);
+  --theme-accent: #e11d48;
+  --theme-accent-hover: #f43f5e;
+  --theme-accent-raw: 225, 29, 72;
+  --theme-nav-bg: rgba(28, 2, 10, 0.85);
+}
+
+[data-theme="ice apple"] {
+  --theme-bg: #081a26;
+  --theme-text-primary: #e0f2fe;
+  --theme-text-secondary: #7dd3fc;
+  --theme-card: rgba(15, 45, 65, 0.6);
+  --theme-border: rgba(56, 189, 248, 0.4);
+  --theme-accent: #0ea5e9;
+  --theme-accent-hover: #38bdf8;
+  --theme-accent-raw: 14, 165, 233;
+  --theme-nav-bg: rgba(8, 26, 38, 0.85);
+}
+
+@theme {
+  --color-theme-bg: var(--theme-bg);
+  --color-theme-text-primary: var(--theme-text-primary);
+  --color-theme-text-secondary: var(--theme-text-secondary);
+  --color-theme-card: var(--theme-card);
+  --color-theme-border: var(--theme-border);
+  --color-theme-accent: var(--theme-accent);
+  --color-theme-accent-hover: var(--theme-accent-hover);
+}
+
+/* Custom transitions and mappings */
+#app-root-container {
+  background-color: var(--theme-bg) !important;
+  color: var(--theme-text-primary) !important;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+#app-navbar {
+  background-color: var(--theme-nav-bg) !important;
+  border-color: var(--theme-border) !important;
+  transition: background-color 0.4s ease, border-color 0.4s ease;
+}
+
+/* Redefining cards and text values for full elements dynamic adaptation */
+.slate-card-override {
+  background-color: var(--theme-card) !important;
+  border-color: var(--theme-border) !important;
+}
+
+.text-slate-primary-override {
+  color: var(--theme-text-primary) !important;
+}
+
+.text-slate-secondary-override {
+  color: var(--theme-text-secondary) !important;
+}
+
+/* Button & Active Highlighting state classes */
+.theme-custom-accent {
+  background-color: var(--theme-accent) !important;
+  color: #ffffff !important;
+}
+.theme-custom-accent:hover {
+  background-color: var(--theme-accent-hover) !important;
+}
+
+.theme-custom-border-accent {
+  border-color: var(--theme-accent) !important;
+  color: var(--theme-accent) !important;
+}
+
+.theme-accent-text-only {
+  color: var(--theme-accent) !important;
+}

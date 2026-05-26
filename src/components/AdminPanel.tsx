@@ -21,9 +21,10 @@ import {
 import { auth, db, handleFirestoreError, OperationType } from "../firebase";
 import { uploadToCloudinary } from "../cloudinary";
 import { Project, Message, VersionLog } from "../types";
+import { AVAILABLE_THEMES } from "../themes";
 import { 
   Lock, Mail, Key, ShieldAlert, Plus, Layers, Inbox, Settings, 
-  Trash2, Edit, Loader2, UploadCloud, CheckCircle, RefreshCcw, LogOut, Check, ChevronDown, Percent, CreditCard
+  Trash2, Edit, Loader2, UploadCloud, CheckCircle, RefreshCcw, LogOut, Check, ChevronDown, Percent, CreditCard, Paintbrush
 } from "lucide-react";
 
 const getSafeLocalStorage = (key: string, defaultValue: string): string => {
@@ -85,6 +86,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
   const [dbLoading, setDbLoading] = useState(false);
   const [dbSuccess, setDbSuccess] = useState("");
   const [dbError, setDbError] = useState("");
+  const [adminDefaultTheme, setAdminDefaultTheme] = useState<string>("dark");
 
   // Project Editing structure state
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -177,6 +179,19 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
           discountHeading: data.discountHeading ?? "অফার! বিশেষ প্রোমোশনাল ডিসকাউন্ট উপলক্ষ্যে আকর্ষণীয় মূল্যছাড়!",
         });
       }
+
+      // 4. Fetch Startup Default Theme Configuration
+      const themeDocRef = doc(db, "settings", "theme");
+      try {
+        const themeSnap = await getDoc(themeDocRef);
+        if (themeSnap.exists() && themeSnap.data().theme) {
+          setAdminDefaultTheme(themeSnap.data().theme);
+        }
+      } catch (e) {
+        console.warn("Theme settings retrieval blocked or unconfigured, fallback loaded.");
+        const fallbackTheme = localStorage.getItem("admin-selected-default-theme") || "dark";
+        setAdminDefaultTheme(fallbackTheme);
+      }
     } catch (err: any) {
       console.error("Fetch Data Error:", err);
       // Reporting via strict standard FireStore handler
@@ -257,6 +272,32 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
     } catch (err: any) {
       console.error("Cloudinary connection test failed", err);
       setDbError(`Verification failed: ${err.message || "Unknown error"}. Please check your Cloud Name and make sure the Upload Preset exists and is configured as 'Unsigned' in your Cloudinary Dashboard.`);
+    } finally {
+      setDbLoading(false);
+    }
+  };
+
+  // Saves global startup default theme choice to Firestore settings document
+  const handleSaveDefaultTheme = async (selectedTheme: string) => {
+    setDbLoading(true);
+    setDbError("");
+    setDbSuccess("");
+    try {
+      const themeDocRef = doc(db, "settings", "theme");
+      await setDoc(themeDocRef, {
+        theme: selectedTheme,
+        updatedAt: serverTimestamp()
+      });
+      setAdminDefaultTheme(selectedTheme);
+      setDbSuccess(`Default Startup Theme set to "${selectedTheme}" successfully!`);
+      setSafeLocalStorage("admin-selected-default-theme", selectedTheme);
+      setTimeout(() => setDbSuccess(""), 4500);
+    } catch (err: any) {
+      console.warn("Database theme settings save failed. Writing locally to fallback cache.", err);
+      setSafeLocalStorage("admin-selected-default-theme", selectedTheme);
+      setAdminDefaultTheme(selectedTheme);
+      setDbSuccess(`Theme saved locally in fallback cache successfully.`);
+      setTimeout(() => setDbSuccess(""), 4500);
     } finally {
       setDbLoading(false);
     }
@@ -1282,45 +1323,84 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
               </button>
             </form>
 
-            {/* Instruction Segment */}
-            <div className="bg-slate-950/65 border border-slate-850 rounded-2xl p-5 sm:p-6 space-y-4">
-              <span className="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider text-amber-400">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
-                কিভাবে configure করবেন? (Preset Setup Guide)
-              </span>
-
-              <div className="space-y-3.5 font-sans text-xs leading-relaxed text-slate-350">
-                <p className="font-bold text-slate-200">
-                  Cloudinary তে Upload Preset না থাকলে ছবি আপলোড কাজ করবে না। নিচে দেওয়া স্টেপগুলো ফলো করে সম্পূর্ণ ফ্রীতে একটি Unsigned Preset তৈরি করে নিন:
+            {/* Right Column Utilities: Theme Settings & Instructions */}
+            <div className="space-y-6">
+              {/* Global Default Theme Configuration Segment */}
+              <div className="bg-slate-950/65 border border-slate-850 rounded-2xl p-5 sm:p-6 space-y-4 text-left">
+                <span className="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider text-indigo-400">
+                  <Paintbrush className="w-4 h-4 text-indigo-400" />
+                  Default Theme Settings (ডিফল্ট থিম ম্যানেজার)
+                </span>
+                
+                <p className="font-sans text-[11px] sm:text-xs text-slate-400 leading-normal">
+                  ফার্স্ট-টাইম ভিজিটরদের সাইটে কোন থিমটি ডিফল্ট দেখাবে তা এখান থেকে সেট করুন। ইউজার নিজে উইন্ডো থেকে পরিবর্তন না করা পর্যন্ত এই থিমটিই দেখবে।
                 </p>
 
-                <ol className="list-decimal pl-4.5 space-y-2.5 text-slate-400 text-[11px] font-mono whitespace-normal">
-                  <li>
-                    <strong className="text-white">Cloudinary Dashboard</strong> এ লগইন করুন এবং বাম পাশের নিচে থাকা <strong className="text-indigo-400">Settings Gear (icon)</strong> এ ক্লিক করুন।
-                  </li>
-                  <li>
-                    বাম পাশের ট্যাব থেকে <strong className="text-white">Upload</strong> সিলেক্ট করুন।
-                  </li>
-                  <li>
-                    একটু নিচে স্ক্রল করে <strong className="text-white">Upload presets</strong> সেকশন খুঁজুন এবং <strong className="text-indigo-400">"Add upload preset"</strong> বাটনে ক্লিক করুন।
-                  </li>
-                  <li>
-                    নতুন পেজে <strong className="text-white">Signing Mode</strong> ড্রপডাউনটি <strong className="text-rose-400 border border-rose-500/20 px-1 py-0.5 rounded bg-rose-500/5 font-sans font-bold">Unsigned</strong> এ পরিবর্তন করুন (এটা সবচেয়ে গুরুত্বপূর্ণ step!)।
-                  </li>
-                  <li>
-                    সেখানে তৈরি হওয়া <strong className="text-white">Upload preset name</strong>-টি কপি করে নিন (যেমন: <code className="text-indigo-300">portfolio_preset</code>)।
-                  </li>
-                  <li>
-                    সবশেষে একদম উপরে ডান কোণায় থাকা <strong className="text-white">"Save" (হলুদ বাটন)</strong> এ ক্লিক করুন।
-                  </li>
-                  <li>
-                    এখন আপনার Cloud Name এবং কপি করা Upload Preset Name-টি এখানে দিয়ে <strong className="text-indigo-400">Verify & Save Variables</strong> বাটনে চাপুন।
-                  </li>
-                </ol>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
+                  {AVAILABLE_THEMES.map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => handleSaveDefaultTheme(t.id)}
+                      className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl border transition-all text-[11px] font-medium cursor-pointer relative ${
+                        adminDefaultTheme === t.id
+                          ? "bg-indigo-600/10 text-indigo-300 border-indigo-500/40 font-bold shadow-md shadow-indigo-600/5"
+                          : "bg-slate-900/50 text-slate-455 border-slate-850 hover:text-white hover:bg-slate-850"
+                      }`}
+                    >
+                      <span className="text-base">{t.emoji}</span>
+                      <span className="capitalize truncate">{t.name}</span>
+                      {adminDefaultTheme === t.id && (
+                        <div className="absolute top-1 right-1 flex h-1.5 w-1.5">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-500"></span>
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-                <div className="border-t border-slate-850 pt-3 text-[10.5px] text-slate-500 font-mono leading-normal">
-                  <span className="text-indigo-400 block font-bold mb-1">PRO-TIP:</span>
-                  আমাদের এই Verify বাটনটি আপনার দেওয়া Credentials লাইভ চেক করার জন্য একটি 1x1 Transparent GIF ফাইল আপলোড টেস্ট করে নিশ্চিত করবে। টেস্ট সফল হলে তবেই API variables সেভ হবে!
+              {/* Instruction Segment */}
+              <div className="bg-slate-950/65 border border-slate-850 rounded-2xl p-5 sm:p-6 space-y-4">
+                <span className="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider text-amber-400">
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+                  কিভাবে configure করবেন? (Preset Setup Guide)
+                </span>
+
+                <div className="space-y-3.5 font-sans text-xs leading-relaxed text-slate-350">
+                  <p className="font-bold text-slate-200 text-left">
+                    Cloudinary তে Upload Preset না থাকলে ছবি আপলোড কাজ করবে না। নিচে দেওয়া স্টেপগুলো ফলো করে সম্পূর্ণ ফ্রীতে একটি Unsigned Preset তৈরি করে নিন:
+                  </p>
+
+                  <ol className="list-decimal pl-4.5 space-y-2.5 text-slate-400 text-[11px] font-mono whitespace-normal text-left">
+                    <li>
+                      <strong className="text-white">Cloudinary Dashboard</strong> এ লগইন করুন এবং বাম পাশের নিচে থাকা <strong className="text-indigo-400">Settings Gear (icon)</strong> এ ক্লিক করুন।
+                    </li>
+                    <li>
+                      বাম পাশের ট্যাব থেকে <strong className="text-white">Upload</strong> সিলেক্ট করুন।
+                    </li>
+                    <li>
+                      একটু নিচে স্ক্রল করে <strong className="text-white">Upload presets</strong> সেকশন খুঁজুন এবং <strong className="text-indigo-400">"Add upload preset"</strong> বাটনে ক্লিক করুন।
+                    </li>
+                    <li>
+                      নতুন পেজে <strong className="text-white">Signing Mode</strong> ড্রপডাউনটি <strong className="text-rose-400 border border-rose-500/20 px-1 py-0.5 rounded bg-rose-500/5 font-sans font-bold">Unsigned</strong> এ পরিবর্তন করুন (এটা সবচেয়ে গুরুত্বপূর্ণ step!)।
+                    </li>
+                    <li>
+                      সেখানে তৈরি হওয়া <strong className="text-white">Upload preset name</strong>-টি কপি করে নিন (যেমন: <code className="text-indigo-300">portfolio_preset</code>)।
+                    </li>
+                    <li>
+                      সবশেষে একদম উপরে ডান কোণায় থাকা <strong className="text-white">"Save" (হলুদ বাটন)</strong> এ ক্লিক করুন।
+                    </li>
+                    <li>
+                      এখন আপনার Cloud Name এবং কপি করা Upload Preset Name-টি এখানে দিয়ে <strong className="text-indigo-400">Verify & Save Variables</strong> বাটনে চাপুন।
+                    </li>
+                  </ol>
+
+                  <div className="border-t border-slate-850 pt-3 text-[10.5px] text-slate-500 font-mono leading-normal text-left">
+                    <span className="text-indigo-400 block font-bold mb-1">PRO-TIP:</span>
+                    আমাদের এই Verify বাটনটি আপনার দেওয়া Credentials লাইভ চেক করার জন্য একটি 1x1 Transparent GIF ফাইল আপলোড টেস্ট করে নিশ্চিত করবে। টেস্ট সফল হলে তবেই API variables সেভ হবে!
+                  </div>
                 </div>
               </div>
             </div>

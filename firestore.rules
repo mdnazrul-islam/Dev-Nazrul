@@ -88,5 +88,11 @@ service cloud.firestore {
       allow create: if isValidId(commentId) && isValidGuestbookComment(incoming());
       allow delete: if isAdmin() && isValidId(commentId);
     }
+
+    // Settings (such as admin configuration for Default Theme): public read, admin write
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidId(settingId);
+    }
   }
 }

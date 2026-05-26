@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { collection, query, orderBy, getDocs } from "firebase/firestore";
+import { collection, query, orderBy, getDocs, doc, getDoc } from "firebase/firestore";
 import { db, handleFirestoreError, OperationType } from "./firebase";
 import { Project } from "./types";
 import Navbar from "./components/Navbar";
@@ -13,7 +13,8 @@ import WorkTimeline from "./components/WorkTimeline";
 import ServicesPricing from "./components/ServicesPricing";
 import Guestbook from "./components/Guestbook";
 import AIAssistant from "./components/AIAssistant";
-import { Laptop, Briefcase, Phone, Settings, ShieldAlert, Cpu, Heart, Code, Sparkles, MapPin, Layers, Loader2, Github, Facebook, Linkedin, MessageCircle } from "lucide-react";
+import { AVAILABLE_THEMES } from "./themes";
+import { Laptop, Briefcase, Phone, Settings, ShieldAlert, Cpu, Heart, Code, Sparkles, MapPin, Layers, Loader2, Github, Facebook, Linkedin, MessageCircle, Sun, Moon } from "lucide-react";
 
 export default function App() {
   const [currentView, setView] = useState<string>("home");
@@ -22,6 +23,59 @@ export default function App() {
   
   const [databaseProjects, setDatabaseProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Theme state choice of the viewer
+  const [theme, setTheme] = useState<string>(() => {
+    try {
+      return localStorage.getItem("portfolio-user-theme") || "dark";
+    } catch {
+      return "dark";
+    }
+  });
+
+  const [adminDefaultTheme, setAdminDefaultTheme] = useState<string>("dark");
+
+  // Load database-configured default theme on startup
+  useEffect(() => {
+    const fetchDefaultThemeSettings = async () => {
+      try {
+        const themeDocRef = doc(db, "settings", "theme");
+        const themeSnap = await getDoc(themeDocRef);
+        if (themeSnap.exists()) {
+          const dbTheme = themeSnap.data().theme;
+          if (dbTheme) {
+            setAdminDefaultTheme(dbTheme);
+            // Sync theme only if this user hasn't explicitly set their own manual visual choice override
+            if (!localStorage.getItem("portfolio-user-theme")) {
+              setTheme(dbTheme);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("Dynamic settings reading skipped in sandbox.");
+      }
+    };
+    fetchDefaultThemeSettings();
+  }, []);
+
+  // Update HTML data-attribute when theme changes
+  useEffect(() => {
+    try {
+      document.documentElement.setAttribute("data-theme", theme);
+    } catch (e) {
+      console.warn("Could not write data-theme attribute on root:", e);
+    }
+  }, [theme]);
+
+  // Handler for user custom theme choice
+  const handleUserThemeChange = (newTheme: string) => {
+    setTheme(newTheme);
+    try {
+      localStorage.setItem("portfolio-user-theme", newTheme);
+    } catch (e) {
+      console.warn("LocalStorage access limits handled safely:", e);
+    }
+  };
 
   // Baseline templates as fallbacks if the Firestore database is empty or loading
   const baselineTemplateProjects: Project[] = [
@@ -251,9 +305,42 @@ export default function App() {
     setActiveProject(null);
   };
 
+  const activeThemeObj = AVAILABLE_THEMES.find(t => t.id === theme) || AVAILABLE_THEMES[0];
+
   return (
-    <div id="app-root-container" className="min-h-screen bg-slate-950 text-white flex flex-col justify-between selection:bg-indigo-600/30">
+    <div id="app-root-container" className="relative min-h-screen text-white flex flex-col justify-between selection:bg-indigo-600/30 overflow-x-hidden">
       
+      {/* Dynamic blurred backdrop image/graphic layer */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none">
+        {/* Transparent blurred background representation */}
+        <img 
+          src={activeThemeObj.image} 
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.07] sm:opacity-[0.11] blur-[24px] sm:blur-[32px] scale-105 transition-all duration-1000 ease-out pointer-events-none"
+          alt=""
+          referrerPolicy="no-referrer"
+        />
+        
+        {/* Floating Ambient Sun/Moon (For Light/Dark Theme) Or Big Atmospheric Fruit Emojis (For Fruits) */}
+        <div className="absolute top-1/4 right-1/10 lg:right-1/8 opacity-[0.04] sm:opacity-[0.08] pointer-events-none select-none transition-all duration-1000 transform scale-100 rotate-12">
+          {!activeThemeObj.isFruit ? (
+            theme === "light" ? (
+              <Sun className="w-80 h-80 text-orange-400 stroke-[1] animate-spin-slow" />
+            ) : (
+              <Moon className="w-80 h-80 text-indigo-400 stroke-[1] animate-pulse" />
+            )
+          ) : (
+            // Big beautifully-designed floating fruit element! Since we want it blurred slightly ("ঝাপসা হয়ে"),
+            // we can render a gorgeous jumbo size emoji inside a blurred layer!
+            <div className="text-[17rem] leading-none select-none filter blur-[3px]">
+              {activeThemeObj.emoji}
+            </div>
+          )}
+        </div>
+        
+        {/* Complementary ambient corner light source glow */}
+        <div className="absolute bottom-1/10 left-1/12 w-96 h-96 bg-indigo-500/5 rounded-full blur-[100px] pointer-events-none" />
+      </div>
+
       {/* Complete Header Bar */}
       <Navbar 
         currentView={currentView} 
@@ -265,10 +352,12 @@ export default function App() {
           setIsAdminLoggedIn(false);
           navigateToRoute("home");
         }}
+        theme={theme}
+        onThemeChange={handleUserThemeChange}
       />
 
       {/* Primary Routing Body */}
-      <main className="flex-grow">
+      <main className="flex-grow relative z-10">
         
         {/* Dynamic Project Detail Page overlay (Shown if clicking any card) */}
         {activeProject ? (
