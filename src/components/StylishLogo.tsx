@@ -107,13 +107,13 @@ export default function StylishLogo({ size = "sm" }: StylishLogoProps) {
         </div>
         
         <div className="space-y-1">
-          <h2 className="relative font-sans font-black text-4xl tracking-tight text-white flex items-center justify-center gap-2">
-            <span className="bg-gradient-to-r from-white via-indigo-150 to-indigo-400 bg-clip-text text-transparent">
+          <h2 className="relative font-sans font-black text-4xl tracking-tight text-slate-100 flex items-center justify-center gap-2">
+            <span className="bg-gradient-to-r from-slate-100 via-indigo-500 to-indigo-400 bg-clip-text text-transparent">
               Dev Nazrul
             </span>
             <Sparkles className="w-5.5 h-5.5 text-indigo-400 animate-pulse fill-indigo-400/25" />
           </h2>
-          <span className="font-mono text-[10px] text-indigo-450 tracking-[0.35em] uppercase font-bold block pt-1">
+          <span className="font-mono text-[10px] text-indigo-455 tracking-[0.35em] uppercase font-bold block pt-1">
             Fullstack & IoT Specialist
           </span>
         </div>
@@ -130,7 +130,7 @@ export default function StylishLogo({ size = "sm" }: StylishLogoProps) {
         </div>
       </div>
       <div className="flex flex-col">
-        <span className="font-sans font-black text-base tracking-tight text-white leading-none group-hover:text-indigo-400 transition-all flex items-center gap-0.5">
+        <span className="font-sans font-black text-base tracking-tight text-slate-100 leading-none group-hover:text-indigo-400 transition-all flex items-center gap-0.5">
           Dev Nazrul
           <Sparkles className="w-3.5 h-3.5 text-indigo-400 animate-pulse fill-indigo-400/25" />
         </span>

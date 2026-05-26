@@ -120,6 +120,42 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
   // Client-side image upload tracker states
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  
+  // Client-side screenshot upload tracker states
+  const [screenshotFiles, setScreenshotFiles] = useState<(File | null)[]>([null, null, null, null, null]);
+  const [uploadingScreenshots, setUploadingScreenshots] = useState<boolean[]>([false, false, false, false, false]);
+
+  const handleScreenshotFileChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    setScreenshotFiles((prev) => {
+      const next = [...prev];
+      next[index] = file;
+      return next;
+    });
+
+    const localUrl = URL.createObjectURL(file);
+    const fieldName = `screenshot${index + 1}` as keyof typeof projectForm;
+    setProjectForm((prev) => ({
+      ...prev,
+      [fieldName]: localUrl,
+    }));
+  };
+
+  const handleClearScreenshot = (index: number) => {
+    setScreenshotFiles((prev) => {
+      const next = [...prev];
+      next[index] = null;
+      return next;
+    });
+    const fieldName = `screenshot${index + 1}` as keyof typeof projectForm;
+    setProjectForm((prev) => ({
+      ...prev,
+      [fieldName]: "",
+    }));
+  };
 
   // Listen to Auth State
   useEffect(() => {
@@ -407,13 +443,43 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
       ? projectForm.techStack.split(",").map((t) => t.trim()).filter(Boolean)
       : [];
 
-    const screenshotsArray = [
-      projectForm.screenshot1,
-      projectForm.screenshot2,
-      projectForm.screenshot3,
-      projectForm.screenshot4,
-      projectForm.screenshot5,
-    ].map(s => s.trim()).filter(Boolean);
+    const screenshotsArray: string[] = [];
+    const screenshotInputs = [
+      { file: screenshotFiles[0], url: projectForm.screenshot1 },
+      { file: screenshotFiles[1], url: projectForm.screenshot2 },
+      { file: screenshotFiles[2], url: projectForm.screenshot3 },
+      { file: screenshotFiles[3], url: projectForm.screenshot4 },
+      { file: screenshotFiles[4], url: projectForm.screenshot5 },
+    ];
+
+    for (let i = 0; i < screenshotInputs.length; i++) {
+      const item = screenshotInputs[i];
+      if (item.file) {
+        setUploadingScreenshots(prev => {
+          const next = [...prev];
+          next[i] = true;
+          return next;
+        });
+        try {
+          const secureUrl = await uploadToCloudinary(item.file, cloudName, uploadPreset);
+          screenshotsArray.push(secureUrl);
+        } catch (err: any) {
+          console.error(`Screenshot ${i + 1} upload failure:`, err);
+          setDbError(`Screenshot ${i + 1} Upload Failed: ${err.message || "Unknown error"}`);
+          setDbLoading(false);
+          setUploadingScreenshots([false, false, false, false, false]);
+          return;
+        } finally {
+          setUploadingScreenshots(prev => {
+            const next = [...prev];
+            next[i] = false;
+            return next;
+          });
+        }
+      } else if (item.url && !item.url.startsWith("blob:")) {
+        screenshotsArray.push(item.url.trim());
+      }
+    }
 
     const projectPayload = {
       title: projectForm.title,
@@ -466,6 +532,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
       });
       setEditingProject(null);
       setImageFile(null);
+      setScreenshotFiles([null, null, null, null, null]);
       setActiveTab("projects");
       fetchData();
     } catch (err: any) {
@@ -483,6 +550,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
   // Put project details into Editing form
   const handleEditInit = (project: Project) => {
     setEditingProject(project);
+    setScreenshotFiles([null, null, null, null, null]);
     setProjectForm({
       title: project.title,
       description: project.description,
@@ -1156,33 +1224,105 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                 />
               </div>
 
-              {/* Optional Project Screenshots Gallery URLs (up to 5) */}
+              {/* Optional Project Screenshots Gallery (Direct File Upload & URL Backups) */}
               <div className="md:col-span-2 border-t border-slate-800/60 pt-5 mt-3 space-y-4">
                 <div>
                   <h4 className="text-sm font-extrabold text-slate-200 uppercase tracking-wider font-sans mb-1">
                     Manage Screenshots Gallery
                   </h4>
                   <p className="text-xs text-slate-400 font-sans leading-normal">
-                    Enable rich visual walk-throughs by adding up to 5 screenshot URLs (Cloudinary, Unsplash, etc). If left blank, the system will fall back to the main showcase image.
+                    Enable rich visual walk-throughs by uploading up to 5 screenshot files directly or pasting URL links below. If left blank, the system will fall back to the main showcase image.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {[1, 2, 3, 4, 5].map((num) => {
+                    const idx = num - 1;
                     const fieldName = `screenshot${num}` as keyof typeof projectForm;
+                    const currentVal = projectForm[fieldName] as string;
+                    const selectedFile = screenshotFiles[idx];
+                    const isUploading = uploadingScreenshots[idx];
+
                     return (
-                      <div key={num} className={num === 5 ? "md:col-span-2" : ""}>
-                        <label className="block text-[10px] uppercase font-mono tracking-wider font-bold text-slate-400 mb-1">
-                          Screenshot URL {num}
-                        </label>
-                        <input
-                          type="url"
-                          name={fieldName}
-                          value={projectForm[fieldName] as string}
-                          onChange={handleFormChange}
-                          placeholder={`https://res.cloudinary.com/demo/image/upload/screenshot_${num}.png`}
-                          className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-2 px-3 outline-none focus:border-indigo-500 text-xs font-mono"
-                        />
+                      <div key={num} className={`p-4 bg-slate-950 rounded-2xl border border-slate-850 space-y-3 ${num === 5 ? "md:col-span-2" : ""}`}>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] uppercase font-mono tracking-wider font-bold text-indigo-400">
+                            Screenshot Product Slot {num}
+                          </span>
+                          {currentVal && (
+                            <button
+                              type="button"
+                              onClick={() => handleClearScreenshot(idx)}
+                              className="text-[10px] text-rose-400 font-mono flex items-center gap-1 hover:text-rose-300 transition-colors cursor-pointer"
+                            >
+                              <Trash2 className="w-3 h-3" /> Clear Slot
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                          {/* File upload prompt */}
+                          <label className="border border-dashed border-slate-800 hover:border-indigo-500/30 rounded-xl p-4 text-center cursor-pointer block bg-slate-900/40 hover:bg-slate-900 transition-all">
+                            <UploadCloud className="w-5 h-5 text-indigo-400 mx-auto mb-1" />
+                            <span className="text-[11px] text-slate-300 block font-bold">Upload screenshot {num}</span>
+                            <span className="text-[9px] text-indigo-400 block font-mono mt-0.5">Click to browse file</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleScreenshotFileChange(idx, e)}
+                              disabled={isUploading}
+                              className="hidden"
+                            />
+                          </label>
+
+                          {/* Preview container */}
+                          <div className="space-y-1">
+                            <label className="block text-[10px] font-mono tracking-wider text-slate-400 uppercase">
+                              Status & Preview
+                            </label>
+                            {currentVal ? (
+                              <div className="relative group rounded-xl overflow-hidden border border-slate-800 bg-slate-900 h-16 flex items-center justify-center">
+                                <img
+                                  src={currentVal}
+                                  alt={`Screenshot ${num} preview`}
+                                  referrerPolicy="no-referrer"
+                                  className="max-h-full max-w-full object-contain"
+                                />
+                                <div className="absolute inset-0 bg-slate-950/75 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all text-center p-1">
+                                  <span className="text-[8px] text-white font-mono uppercase bg-indigo-650 px-1.5 py-0.5 rounded">
+                                    {selectedFile ? "Pending Publish Upload" : "Active Preview"}
+                                  </span>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="rounded-xl border border-dashed border-slate-800/80 bg-slate-900/20 h-16 flex items-center justify-center text-[10px] text-slate-500 font-mono">
+                                No asset selected
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Text URL Backup */}
+                        <div className="pt-1 select-none">
+                          <label className="block text-[9px] uppercase font-mono tracking-wider font-bold text-slate-400 mb-1">
+                            Or paste Screenshot URL {num} directly:
+                          </label>
+                          <input
+                            type="url"
+                            name={fieldName}
+                            value={currentVal.startsWith("blob:") ? "" : currentVal}
+                            onChange={(e) => {
+                              setScreenshotFiles((prev) => {
+                                const next = [...prev];
+                                next[idx] = null;
+                                return next;
+                              });
+                              handleFormChange(e);
+                            }}
+                            placeholder="https://res.cloudinary.com/..."
+                            className="w-full bg-slate-900 border border-slate-850 text-white rounded-lg py-1.5 px-3 outline-none focus:border-indigo-500 text-[11px] font-mono"
+                          />
+                        </div>
                       </div>
                     );
                   })}
