@@ -744,7 +744,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
 
   // Authorised View Panel Layout
   return (
-    <div id="authorized-admin-panel" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-white font-sans">
+    <div id="authorized-admin-panel" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-theme-text-primary font-sans">
       
       {/* Admin Dashboard header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-slate-800 mb-8">
@@ -753,7 +753,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping inline-block" />
             ADMIN ACCREDITED
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">Control Panel</h2>
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-theme-text-primary">Control Panel</h2>
           <p className="text-xs text-slate-400 mt-1 font-mono">MD. NAZRUL ISLAM PORTFOLIO ENGINE</p>
         </div>
 
@@ -1043,7 +1043,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                   name="category"
                   value={projectForm.category}
                   onChange={handleFormChange}
-                  className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-sm"
+                  className="w-full bg-slate-950 border border-slate-800 text-theme-text-primary rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-sm"
                 >
                   <option value="Web">Web (Hosted System Website)</option>
                   <option value="App">App (Native Mobile APK Package)</option>
@@ -1060,7 +1060,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                   onChange={handleFormChange}
                   placeholder="e.g. Health Sync Analytics Dashboard"
                   required
-                  className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-sm font-medium"
+                  className="w-full bg-slate-950 border border-slate-800 text-theme-text-primary rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-sm font-medium"
                 />
               </div>
 
@@ -1074,7 +1074,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                   onChange={handleFormChange}
                   placeholder="React, Next.js, Firebase Auth, Tailwind, TypeScript, Node.js"
                   required
-                  className="w-full bg-slate-950 border border-slate-800 text-slate-100 rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-sm font-mono"
+                  className="w-full bg-slate-950 border border-slate-800 text-theme-text-primary rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-sm font-mono"
                 />
               </div>
 
@@ -1088,7 +1088,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                   placeholder="Describe details, challenges solved, architecture overview..."
                   required
                   rows={4}
-                  className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-sm resize-none whitespace-pre-wrap leading-relaxed"
+                  className="w-full bg-slate-950 border border-slate-800 text-theme-text-primary rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-sm resize-none whitespace-pre-wrap leading-relaxed"
                 />
               </div>
 
@@ -1178,7 +1178,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                   value={projectForm.videoUrl}
                   onChange={handleFormChange}
                   placeholder="e.g. https://www.youtube.com/watch?v=VIDEO_ID"
-                  className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-sm font-mono"
+                  className="w-full bg-slate-950 border border-slate-800 text-theme-text-primary rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-sm font-mono"
                 />
               </div>
 
@@ -1193,7 +1193,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                     onChange={handleFormChange}
                     placeholder="https://myportfolioproject.com"
                     required
-                    className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-sm font-mono"
+                    className="w-full bg-slate-950 border border-slate-800 text-theme-text-primary rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-sm font-mono"
                   />
                 </div>
               ) : (
@@ -1206,7 +1206,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                     onChange={handleFormChange}
                     placeholder="https://example-drive.com/my-apk-package.apk"
                     required
-                    className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-sm font-mono"
+                    className="w-full bg-slate-950 border border-slate-800 text-theme-text-primary rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-sm font-mono"
                   />
                 </div>
               )}
@@ -1220,18 +1220,18 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                   onChange={handleFormChange}
                   placeholder="Introduce step-by-step installation instructions, environment keys, CLI variables, or commands needed to run..."
                   rows={4}
-                  className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-sm resize-none whitespace-pre-wrap leading-relaxed"
+                  className="w-full bg-slate-950 border border-slate-800 text-theme-text-primary rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-sm resize-none whitespace-pre-wrap leading-relaxed"
                 />
               </div>
 
-              {/* Optional Project Screenshots Gallery (Direct File Upload & URL Backups) */}
+              {/* Optional Project Screenshots Gallery (Direct File Upload & Preview Slots) */}
               <div className="md:col-span-2 border-t border-slate-800/60 pt-5 mt-3 space-y-4">
                 <div>
-                  <h4 className="text-sm font-extrabold text-slate-200 uppercase tracking-wider font-sans mb-1">
+                  <h4 className="text-sm font-extrabold text-theme-text-primary uppercase tracking-wider font-sans mb-1">
                     Manage Screenshots Gallery
                   </h4>
-                  <p className="text-xs text-slate-400 font-sans leading-normal">
-                    Enable rich visual walk-throughs by uploading up to 5 screenshot files directly or pasting URL links below. If left blank, the system will fall back to the main showcase image.
+                  <p className="text-xs text-slate-450 font-sans leading-normal">
+                    Enable rich visual walk-throughs by uploading up to 5 screenshot files directly. If left blank, the system will fall back to the main showcase image.
                   </p>
                 </div>
 
@@ -1300,28 +1300,6 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                               </div>
                             )}
                           </div>
-                        </div>
-
-                        {/* Text URL Backup */}
-                        <div className="pt-1 select-none">
-                          <label className="block text-[9px] uppercase font-mono tracking-wider font-bold text-slate-400 mb-1">
-                            Or paste Screenshot URL {num} directly:
-                          </label>
-                          <input
-                            type="url"
-                            name={fieldName}
-                            value={currentVal.startsWith("blob:") ? "" : currentVal}
-                            onChange={(e) => {
-                              setScreenshotFiles((prev) => {
-                                const next = [...prev];
-                                next[idx] = null;
-                                return next;
-                              });
-                              handleFormChange(e);
-                            }}
-                            placeholder="https://res.cloudinary.com/..."
-                            className="w-full bg-slate-900 border border-slate-850 text-white rounded-lg py-1.5 px-3 outline-none focus:border-indigo-500 text-[11px] font-mono"
-                          />
                         </div>
                       </div>
                     );
