@@ -102,6 +102,11 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
     liveLink: "",
     apkLink: "",
     guide: "",
+    screenshot1: "",
+    screenshot2: "",
+    screenshot3: "",
+    screenshot4: "",
+    screenshot5: "",
   });
 
   // Version Logging state for a project
@@ -402,6 +407,14 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
       ? projectForm.techStack.split(",").map((t) => t.trim()).filter(Boolean)
       : [];
 
+    const screenshotsArray = [
+      projectForm.screenshot1,
+      projectForm.screenshot2,
+      projectForm.screenshot3,
+      projectForm.screenshot4,
+      projectForm.screenshot5,
+    ].map(s => s.trim()).filter(Boolean);
+
     const projectPayload = {
       title: projectForm.title,
       description: projectForm.description,
@@ -412,6 +425,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
       liveLink: projectForm.category === "Web" ? (projectForm.liveLink || null) : null,
       apkLink: projectForm.category === "App" ? (projectForm.apkLink || null) : null,
       guide: projectForm.guide || null,
+      screenshots: screenshotsArray,
       updatedAt: serverTimestamp(),
     };
 
@@ -444,6 +458,11 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
         liveLink: "",
         apkLink: "",
         guide: "",
+        screenshot1: "",
+        screenshot2: "",
+        screenshot3: "",
+        screenshot4: "",
+        screenshot5: "",
       });
       setEditingProject(null);
       setImageFile(null);
@@ -474,6 +493,11 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
       liveLink: project.liveLink || "",
       apkLink: project.apkLink || "",
       guide: project.guide || "",
+      screenshot1: project.screenshots?.[0] || "",
+      screenshot2: project.screenshots?.[1] || "",
+      screenshot3: project.screenshots?.[2] || "",
+      screenshot4: project.screenshots?.[3] || "",
+      screenshot5: project.screenshots?.[4] || "",
     });
     setActiveTab("add");
   };
@@ -1130,6 +1154,39 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                   rows={4}
                   className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-sm resize-none whitespace-pre-wrap leading-relaxed"
                 />
+              </div>
+
+              {/* Optional Project Screenshots Gallery URLs (up to 5) */}
+              <div className="md:col-span-2 border-t border-slate-800/60 pt-5 mt-3 space-y-4">
+                <div>
+                  <h4 className="text-sm font-extrabold text-slate-200 uppercase tracking-wider font-sans mb-1">
+                    Manage Screenshots Gallery
+                  </h4>
+                  <p className="text-xs text-slate-400 font-sans leading-normal">
+                    Enable rich visual walk-throughs by adding up to 5 screenshot URLs (Cloudinary, Unsplash, etc). If left blank, the system will fall back to the main showcase image.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[1, 2, 3, 4, 5].map((num) => {
+                    const fieldName = `screenshot${num}` as keyof typeof projectForm;
+                    return (
+                      <div key={num} className={num === 5 ? "md:col-span-2" : ""}>
+                        <label className="block text-[10px] uppercase font-mono tracking-wider font-bold text-slate-400 mb-1">
+                          Screenshot URL {num}
+                        </label>
+                        <input
+                          type="url"
+                          name={fieldName}
+                          value={projectForm[fieldName] as string}
+                          onChange={handleFormChange}
+                          placeholder={`https://res.cloudinary.com/demo/image/upload/screenshot_${num}.png`}
+                          className="w-full bg-slate-950 border border-slate-800 text-white rounded-xl py-2 px-3 outline-none focus:border-indigo-500 text-xs font-mono"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
             </div>

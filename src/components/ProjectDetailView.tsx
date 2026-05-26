@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Project } from "../types";
-import { ArrowLeft, Globe, Smartphone, Play, LogIn, ChevronDown, ChevronUp, Download, Eye, QrCode, Share2, Check } from "lucide-react";
+import { ArrowLeft, Globe, Smartphone, Play, LogIn, ChevronDown, ChevronUp, Download, Eye, QrCode, Share2, Check, X } from "lucide-react";
 
 interface ProjectDetailViewProps {
   project: Project;
@@ -10,6 +10,12 @@ interface ProjectDetailViewProps {
 export default function ProjectDetailView({ project, onBack }: ProjectDetailViewProps) {
   const [activeAccordion, setActiveAccordion] = useState<"guide" | "changelog" | null>("guide");
   const [copiedShare, setCopiedShare] = useState(false);
+  const [activeScreenshot, setActiveScreenshot] = useState<string>(
+    project.screenshots && project.screenshots.length > 0
+      ? project.screenshots[0]
+      : project.imageUrl
+  );
+  const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
 
   const isApp = project.category === "App";
 
@@ -149,40 +155,74 @@ export default function ProjectDetailView({ project, onBack }: ProjectDetailView
           {/* Left Column: Visual Showcase (Image / Video Embed) */}
           <div className="lg:col-span-7 space-y-6">
             
-            {/* Embedded Video Walkthrough if present, otherwise Cloudinary static image */}
-            {embedVideoUrl ? (
-              <div className="aspect-video w-full rounded-2xl overflow-hidden bg-black border border-slate-800 shadow-xl relative">
-                <iframe
-                  src={`${embedVideoUrl}?autoplay=0`}
-                  title={`${project.title} walk-through`}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full border-0"
-                />
-              </div>
-            ) : (
-              <div className="aspect-[16/10] w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 shadow-xl">
-                <img
-                  src={project.imageUrl || "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80"}
-                  alt={project.title}
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover"
-                />
+            {/* Embedded Video Walkthrough if present */}
+            {embedVideoUrl && (
+              <div className="space-y-2">
+                <span className="text-[10px] uppercase font-mono tracking-wider text-indigo-400 font-extrabold block">
+                  Interactive Video Walkthrough
+                </span>
+                <div className="aspect-video w-full rounded-2xl overflow-hidden bg-black border border-slate-800 shadow-xl relative animate-fade-in">
+                  <iframe
+                    src={`${embedVideoUrl}?autoplay=0`}
+                    title={`${project.title} walk-through`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full border-0"
+                  />
+                </div>
               </div>
             )}
 
-            {/* If Video was displayed, we show the static Cloudinary image just below */}
-            {embedVideoUrl && (
-              <div className="rounded-xl overflow-hidden bg-slate-900 border border-slate-800/60 p-2.5">
-                <p className="text-[10px] font-mono text-slate-400 mb-2.5 uppercase tracking-wider px-1">Static Image Preview:</p>
+            {/* Screenshots Gallery Section (Up to 5 screenshots) */}
+            <div className="space-y-4">
+              <span className="text-[10px] uppercase font-mono tracking-wider text-indigo-400 font-extrabold block">
+                {project.screenshots && project.screenshots.length > 0 
+                  ? `Visual Screenshots (${project.screenshots.length} available)` 
+                  : "Showcase Image Preview"}
+              </span>
+              
+              {/* Main Screenshot Viewport (Click-to-Fullscreen) */}
+              <div 
+                className="aspect-[16/10] w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-850 shadow-xl relative group cursor-zoom-in"
+                onClick={() => setFullscreenImage(activeScreenshot)}
+              >
                 <img
-                  src={project.imageUrl}
-                  alt={`${project.title} Static View`}
+                  src={activeScreenshot}
+                  alt={`${project.title} active screen`}
                   referrerPolicy="no-referrer"
-                  className="w-full h-auto max-h-[300px] object-cover rounded-lg border border-slate-800"
+                  className="w-full h-full object-cover group-hover:scale-[1.015] transition-transform duration-350"
                 />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                  <div className="px-4 py-2 bg-slate-950/80 rounded-xl border border-slate-800 text-xs text-indigo-400 font-mono tracking-wider uppercase shadow-xl flex items-center gap-1.5 animate-pulse">
+                    <Eye className="w-4 h-4" /> Click to view full screen
+                  </div>
+                </div>
               </div>
-            )}
+
+              {/* Individual clickable thumbnail rows, displayed only if project.screenshots has urls */}
+              {project.screenshots && project.screenshots.length > 0 && (
+                <div className="grid grid-cols-5 gap-3.5 pt-1">
+                  {project.screenshots.map((screen, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveScreenshot(screen)}
+                      className={`aspect-[16/10] rounded-xl overflow-hidden border transition-all cursor-pointer bg-slate-900 ${
+                        activeScreenshot === screen
+                          ? "border-indigo-500 ring-2 ring-indigo-500/20 scale-[1.03]"
+                          : "border-slate-800 opacity-60 hover:opacity-100"
+                      }`}
+                    >
+                      <img
+                        src={screen}
+                        alt={`Screenshot ${idx + 1}`}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Description Card */}
             <div className="bg-slate-900/60 p-6 rounded-2xl border border-slate-800/80 space-y-4">
@@ -402,6 +442,35 @@ export default function ProjectDetailView({ project, onBack }: ProjectDetailView
 
         </div>
       </div>
+
+      {/* Fullscreen Image Lightbox Modal Overlay */}
+      {fullscreenImage && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center p-4 animate-in fade-in duration-200 cursor-zoom-out"
+          onClick={() => setFullscreenImage(null)}
+        >
+          {/* Close trigger button */}
+          <button 
+            type="button"
+            className="absolute top-6 right-6 p-3 rounded-full bg-slate-900/65 border border-slate-800 text-white hover:text-indigo-400 hover:scale-105 transition-all cursor-pointer z-50"
+            onClick={() => setFullscreenImage(null)}
+            aria-label="Close Fullscreen View"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          
+          <img 
+            src={fullscreenImage} 
+            alt="Fullscreen Screenshot" 
+            referrerPolicy="no-referrer"
+            className="max-h-[85vh] max-w-[95vw] object-contain rounded-xl shadow-2xl border border-slate-900 select-none animate-in zoom-in-95 duration-150"
+          />
+          <p className="mt-4 font-mono text-center text-xs text-slate-400 select-none">
+            Click anywhere on background to exit fullscreen
+          </p>
+        </div>
+      )}
+
     </div>
   );
 }

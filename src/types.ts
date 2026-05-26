@@ -15,6 +15,7 @@ export interface Project {
   liveLink?: string; // If Web
   apkLink?: string;  // If App
   guide?: string;    // Step-by-step user guide
+  screenshots?: string[]; // Up to 5 presentation screenshots
   versionLogs?: VersionLog[];
   createdAt: any; // Firestore Timestamp
   updatedAt: any; // Firestore Timestamp

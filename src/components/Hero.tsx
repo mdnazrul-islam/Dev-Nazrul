@@ -9,12 +9,12 @@ interface HeroProps {
 export default function Hero({ onExploreProjects, onContactMe }: HeroProps) {
   // Configured skill sets with fine-tuned specific styling
   const keySkills = [
-    { name: "Next.js", color: "from-slate-100 to-slate-400 text-slate-900 border-slate-700 bg-slate-800" },
-    { name: "React & TypeScript", color: "from-sky-400 to-indigo-500 text-sky-400 border-sky-500/20 bg-sky-950/20" },
-    { name: "Tailwind CSS", color: "from-cyan-400 to-blue-500 text-cyan-400 border-cyan-500/20 bg-cyan-950/20" },
-    { name: "Firebase (Auth & Firestore)", color: "from-amber-400 to-orange-500 text-amber-400 border-amber-500/20 bg-amber-950/20" },
-    { name: "Cloudinary Cloud Hosting", color: "from-blue-400 to-purple-500 text-blue-400 border-blue-500/20 bg-blue-950/20" },
-    { name: "Node.js & Express", color: "from-green-400 to-emerald-500 text-green-400 border-green-500/20 bg-green-950/20" },
+    { name: "Next.js", color: "bg-slate-900 border-slate-800 text-slate-100" },
+    { name: "React & TypeScript", color: "bg-slate-900 border-slate-800 text-slate-100" },
+    { name: "Tailwind CSS", color: "bg-slate-900 border-slate-800 text-slate-100" },
+    { name: "Firebase (Auth & Firestore)", color: "bg-slate-900 border-slate-800 text-slate-100" },
+    { name: "Cloudinary Cloud Hosting", color: "bg-slate-900 border-slate-800 text-slate-100" },
+    { name: "Node.js & Express", color: "bg-slate-900 border-slate-800 text-slate-100" },
   ];
 
   return (
@@ -37,10 +37,10 @@ export default function Hero({ onExploreProjects, onContactMe }: HeroProps) {
                   <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
                   AVAILABLE FOR PROFESSIONAL PROJECTS
                 </div>
-                <h1 className="font-sans font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-none bg-gradient-to-r from-slate-100 via-indigo-155 to-indigo-400 bg-clip-text text-transparent">
+                <h1 className="font-sans font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-none bg-gradient-to-r from-slate-100 via-indigo-500 to-indigo-400 bg-clip-text text-transparent">
                   Dev Nazrul
                 </h1>
-                <p className="font-sans text-xl text-indigo-455 font-bold tracking-wide">
+                <p className="font-sans text-xl text-indigo-400 font-bold tracking-wide">
                   Professional Full-stack Developer & Technical Engineer
                 </p>
               </div>
@@ -56,14 +56,14 @@ export default function Hero({ onExploreProjects, onContactMe }: HeroProps) {
                 href="https://wa.me/8801793840762" 
                 target="_blank" 
                 rel="noreferrer"
-                className="flex items-center gap-2 hover:text-green-400 transition-colors bg-slate-800/40 p-2 rounded-lg border border-slate-800"
+                className="flex items-center gap-2 hover:text-green-400 transition-colors bg-slate-900 border border-slate-800 p-2 rounded-lg"
               >
                 <Phone className="w-4 h-4 text-green-500" />
                 <span>+8801793840762</span>
               </a>
               <a 
                 href="mailto:nazrul.islam.uli019@gmail.com" 
-                className="flex items-center gap-2 hover:text-indigo-400 transition-colors bg-slate-800/40 p-2 rounded-lg border border-slate-800"
+                className="flex items-center gap-2 hover:text-indigo-400 transition-colors bg-slate-900 border border-slate-800 p-2 rounded-lg"
               >
                 <Mail className="w-4 h-4 text-indigo-400" />
                 <span>nazrul.islam.uli019@gmail.com</span>
@@ -74,14 +74,14 @@ export default function Hero({ onExploreProjects, onContactMe }: HeroProps) {
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start pt-2">
               <button
                 onClick={onExploreProjects}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-8 py-3.5 rounded-xl shadow-lg shadow-indigo-600/35 hover:shadow-indigo-600/50 transition-all cursor-pointer"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-indigo-650 hover:bg-indigo-600 text-white font-semibold px-8 py-3.5 rounded-xl shadow-lg shadow-indigo-600/35 hover:shadow-indigo-600/50 transition-all cursor-pointer"
               >
                 Explore Projects
                 <ArrowUpRight className="w-4 h-4" />
               </button>
               <button
                 onClick={onContactMe}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 transition-all cursor-pointer"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-850 text-slate-100 border border-slate-800 transition-all cursor-pointer py-3.5 px-8 rounded-xl font-semibold"
               >
                 Get In Touch
               </button>

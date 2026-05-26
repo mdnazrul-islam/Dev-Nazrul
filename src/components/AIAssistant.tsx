@@ -83,19 +83,19 @@ export default function AIAssistant() {
   ];
 
   return (
-    <div id="ai-assistant-wrapper" className="fixed bottom-6 right-6 z-50">
+    <div id="ai-assistant-wrapper" className="fixed bottom-12 sm:bottom-16 right-6 z-50">
       
       {/* Small Glowing Toggle Trigger Button */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
           id="ai-assistant-trigger-btn"
-          className="relative group flex items-center gap-2 bg-gradient-to-r from-indigo-650 to-purple-650 hover:from-indigo-600 hover:to-purple-600 text-white font-bold p-3.5 sm:px-5 sm:py-3.5 rounded-full shadow-2xl transition-all duration-300 pointer-events-auto cursor-pointer border border-indigo-505/20"
+          className="relative group flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold p-3.5 sm:px-5 sm:py-3.5 rounded-full shadow-2xl transition-all duration-300 pointer-events-auto cursor-pointer border border-indigo-500/20"
         >
           {/* Ripple ambient effect */}
           <span className="absolute -inset-1 rounded-full bg-indigo-500/20 blur pointer-events-none group-hover:scale-110 transition duration-300"></span>
-          <Bot className="w-5 h-5 animate-pulse text-indigo-200" />
-          <span className="hidden sm:inline font-mono text-[11px] tracking-wider uppercase">AI Advisor Expert</span>
+          <Bot className="w-5 h-5 animate-pulse text-indigo-100" />
+          <span className="hidden sm:inline font-mono text-[11px] tracking-wider uppercase text-indigo-100">AI Advisor Expert</span>
           {/* Notification bubble */}
           <span className="absolute -top-1 -right-1 w-3 h-3 bg-rose-500 border border-slate-950 rounded-full animate-bounce"></span>
         </button>
@@ -105,23 +105,23 @@ export default function AIAssistant() {
       {isOpen && (
         <div
           id="ai-assistant-panel"
-          className="w-80 sm:w-96 h-[500px] bg-slate-900 border border-slate-800 rounded-2xl flex flex-col justify-between shadow-2xl relative overflow-hidden transition-all duration-300 animate-in fade-in slide-in-from-bottom-5 border-indigo-505/40"
+          className="w-80 sm:w-96 h-[500px] bg-slate-900 border border-slate-800 rounded-2xl flex flex-col justify-between shadow-2xl relative overflow-hidden transition-all duration-300 animate-in fade-in slide-in-from-bottom-5 border-indigo-500/40"
         >
           {/* Ambient Glow */}
-          <div className="absolute top-0 left-0 w-32 h-32 bg-indigo-505/5 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute top-0 left-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
 
           {/* Header Panel */}
           <div className="flex items-center justify-between p-4 bg-slate-950/80 border-b border-slate-850 z-10">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-550 flex items-center justify-center relative">
+              <div className="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500 flex items-center justify-center relative">
                 <Sparkles className="w-4 h-4 text-indigo-400 animate-spin-slow" />
                 <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-slate-950"></span>
               </div>
               <div>
-                <h4 className="font-sans font-extrabold text-xs text-white tracking-widest uppercase flex items-center gap-1">
+                <h4 className="font-sans font-extrabold text-xs text-slate-100 tracking-widest uppercase flex items-center gap-1">
                   DEV NAZRUL AI <span className="text-[9px] text-indigo-400 font-mono font-normal">v3.5</span>
                 </h4>
-                <span className="text-[9px] font-mono text-slate-450 uppercase tracking-tight block">Live Studio Grounding Active</span>
+                <span className="text-[9px] font-mono text-slate-400 uppercase tracking-tight block">Live Studio Grounding Active</span>
               </div>
             </div>
 
