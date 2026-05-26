@@ -25,6 +25,167 @@ export default function AIAssistant() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
+  const calculateLocalResponse = (query: string): string => {
+    const text = query.toLowerCase();
+    const isBengali = /[\u0980-\u09FF]/.test(text);
+
+    // 1. Pricing / Cost Keywords
+    if (
+      text.includes("price") || 
+      text.includes("pricing") || 
+      text.includes("cost") || 
+      text.includes("budget") || 
+      text.includes("charge") || 
+      text.includes("fee") || 
+      text.includes("দাম") || 
+      text.includes("খরচ") || 
+      text.includes("বাজেট") || 
+      text.includes("টাকা") || 
+      text.includes("মূল্য") || 
+      text.includes("কস্ট")
+    ) {
+      if (isBengali) {
+        return "মোঃ নজরুল ইসলাম অত্যন্ত প্রতিযোগিতামূলক এবং বাজেট-বান্ধব সেবা দিয়ে থাকেন:\n\n" +
+          "💼 **১. রিয়াক্ট/নেক্সট ওয়েব ডেভেলপমেন্ট (Web Apps)**: খরচ শুরু মাত্র **৳১২,০০০ BDT** থেকে।\n" +
+          "📱 **২. নেটিভ অ্যান্ড্রয়েড আইওটি (Android & BLE IoT)**: খরচ শুরু মাত্র **৳১৬,০৫০ BDT** থেকে। (ব্লুটুথ BLE ও সেন্সর রিডিং সহ)\n" +
+          "🔒 **৩. ব্যাকএন্ড এপিআই ও সিকিউরিটি অডিট**: খরচ শুরু মাত্র **৳৮,০০০ BDT** থেকে।\n\n" +
+          "আপনি চাইলে এই ওয়েবসাইটের **Live Budget Calculator** ব্যবহার করে আপনার পছন্দমতো মডিউল যোগ-বিয়োগ করে ইনস্ট্যান্ট হিসাব দেখে নিতে পারেন। অথবা সরাসরি আলাপ করতে ওনারটি WhatsApp-এ নক করতে পারেন:\n" +
+          "👉 [+৮৮০১৭৯৩৮৪০৭৬২](https://wa.me/8801793840762)";
+      } else {
+        return "Md. Nazrul Islam offers highly competitive and transparent tier systems:\n\n" +
+          "💼 **1. React / Next.js Web Portals**: Starting from **৳12,000 BDT**.\n" +
+          "📱 **2. Kotlin Native Android Apps**: Starting from **৳16,050 BDT** (Includes BLE tracking & custom state managers).\n" +
+          "🔒 **3. Back-end APIs & Rules Auditing**: Starting from **৳8,000 BDT**.\n\n" +
+          "You can try the **Live Budget Calculator** directly on this site to sum up features of interest! Or contact him directly on WhatsApp:\n" +
+          "👉 [+8801793840762](https://wa.me/8801793840762)";
+      }
+    }
+
+    // 2. Android / IoT / BLE / Sensors
+    if (
+      text.includes("android") || 
+      text.includes("iot") || 
+      text.includes("kotlin") || 
+      text.includes("ble") || 
+      text.includes("bluetooth") || 
+      text.includes("sensor") || 
+      text.includes("telemetry") || 
+      text.includes("কৃষি") || 
+      text.includes("ব্লুটুথ") || 
+      text.includes("ডিভাইস") || 
+      text.includes("আইওটি")
+    ) {
+      if (isBengali) {
+        return "মোঃ নজরুল ইসলাম অ্যান্ড্রয়েড আইওটি (IoT) ও এগ্রো-টেলিমետ্রি প্রজেক্টে বিশেষভাবে দক্ষ:\n\n" +
+          "📡 **Bluetooth Low Energy (BLE)**: ব্লুটুথ ডিভাইস স্ক্যানিং, পেয়ারিং এবং অ্যাড্রেস ফিল্টারিংয়ের চমৎকার অভিজ্ঞতা।\n" +
+          "🌾 **IoT Telemetry**: মাটির আর্দ্রতা, পিএইচ মিটার এবং বৈরী তাপমাত্রা রিয়েল-টাইমে অ্যান্ড্রোয়েড অ্যাপে ট্র্যাকিং।\n" +
+          "⚙️ **Native SDK & Compose**: চমৎকার স্পিড এবং অফলাইন লোকাল ডেটা সুরক্ষার জন্য কোটলিন ও জেটপ্যাক কম্পোজ ব্যবহার।\n\n" +
+          "ওনার বেশ কিছু কাজের ভিডিও এবং সোর্স কোড রানিং কন্ডিশনে আপনি 'প্রজেক্ট গ্যালারি' ট্যাবে সরাসরি দেখে নিতে পারবেন!";
+      } else {
+        return "Md. Nazrul Islam is highly specialized in custom Android Native & IoT agricultural telemetry systems:\n\n" +
+          "📡 **Bluetooth Low Energy (BLE)**: Implements fast polling and zero-noise hardware pairing flows on Android.\n" +
+          "🌾 **IoT & Agro Sensors**: Integrates real-time values like humidity, soil moisture trackers, and temperature indicators.\n" +
+          "⚙️ **Native Performance**: Utilizes Kotlin Native SDK & Jetpack Compose for low battery consumption.\n\n" +
+          "Explore the dynamic screenshot galleries and live project video links here on the portfolio!";
+      }
+    }
+
+    // 3. Contact / Hire / Phone / WhatsApp
+    if (
+      text.includes("contact") || 
+      text.includes("hire") || 
+      text.includes("whatsapp") || 
+      text.includes("phone") || 
+      text.includes("email") || 
+      text.includes("address") || 
+      text.includes("যোগাযোগ") || 
+      text.includes("হোয়াটসঅ্যাপ") || 
+      text.includes("নাম্বার") || 
+      text.includes("ঠিকানা") || 
+      text.includes("ইমেইল") || 
+      text.includes("কন্টাক্ট")
+    ) {
+      if (isBengali) {
+        return "মোঃ নজরুল ইসলামের সাথে সরাসরি নিচে দেওয়া মাধ্যমগুলো দিয়ে যোগাযোগ করতে পারেন:\n\n" +
+          "💬 **WhatsApp**: [+৮৮০১৭৯৩৮৪০৭৬২](https://wa.me/8801793840762) (সবচেয়ে দ্রুত রেসপন্স ও ফ্রি কনসাল্টেশনের জন্য উপযুক্ত)\n" +
+          "📧 **ইমেইল**: nazrul.islam.uli019@gmail.com\n" +
+          "💻 **GitHub**: [github.com/dev-nazrul-bd](https://github.com/dev-nazrul-bd)\n" +
+          "📍 **বর্তমান অবস্থান**: বাংলাদেশ (রিমোটলি গ্লোবাল কাজ করেন)।\n\n" +
+          "যেকোনো প্রজেক্ট আলোচনার জন্য নির্দ্বিধায় মেসেজ দিতে পারেন!";
+      } else {
+        return "You can get in touch with Md. Nazrul Islam immediately:\n\n" +
+          "💬 **WhatsApp**: [+8801793840762](https://wa.me/8801793840762) (Highly recommended for rapid, direct consultation)\n" +
+          "📧 **Email**: nazrul.islam.uli019@gmail.com\n" +
+          "💻 **GitHub profile**: [github.com/dev-nazrul-bd](https://github.com/dev-nazrul-bd)\n" +
+          "📍 **Location**: Bangladesh (Available for remote contracts globally).";
+      }
+    }
+
+    // 4. Skills / Tech / Stack
+    if (
+      text.includes("skill") || 
+      text.includes("expert") || 
+      text.includes("stack") || 
+      text.includes("experience") || 
+      text.includes("tech") || 
+      text.includes("ভাষা") || 
+      text.includes("ল্যাঙ্গুয়েজ") || 
+      text.includes("দক্ষতা") || 
+      text.includes("অভিজ্ঞতা") || 
+      text.includes("টেকনোলজি")
+    ) {
+      if (isBengali) {
+        return "মোঃ নজরুল ইসলামের কারিগরি দক্ষতা চমৎকার ও বিস্তৃত:\n\n" +
+          "🚀 **ফ্রন্টএন্ড**: Next.js (App Router), React, Tailwind CSS (v4), TypeScript\n" +
+          "⚙️ **ব্যাকএন্ড**: Node.js, Express, REST APIs\n" +
+          "📱 **মোবাইল**: Kotlin Native, Jetpack Compose, BLE telemetry interfaces\n" +
+          "💾 **ডাটাবেজ**: Cloud Firestore, Realtime Database (with custom secure zero-trust validation rules)\n\n" +
+          "তিনি মোবাইল অ্যাপ ও রেসপন্সিভ ওয়েব পোর্টালের চমৎকার কম্বিনেশনে রিয়েল-টাইম ক্লায়েন্ট প্রজেক্ট হ্যান্ডেল করেন।";
+      } else {
+        return "Md. Nazrul Islam possesses a robust and clean production tech stack:\n\n" +
+          "🚀 **Web Interfaces**: Next.js, React, Tailwind CSS, TypeScript, JavaScript\n" +
+          "⚙️ **Server & Endpoints**: Node.js, Express\n" +
+          "📱 **Mobile Native**: Kotlin SDK, Bluetooth Low Energy (BLE), Native Telemetry gateways\n" +
+          "💾 **Databases**: Firestore, Custom security policies, indexes auditing.";
+      }
+    }
+
+    // 5. Greeting / Intro
+    if (
+      text.includes("hi") || 
+      text.includes("hello") || 
+      text.includes("hey") || 
+      text.includes("কেমন") || 
+      text.includes("হ্যালো") || 
+      text.includes("হাই") || 
+      text.includes("সালাম") || 
+      text.includes("আসসালামু")
+    ) {
+      if (isBengali) {
+        return "আসসালামু আলাইকুম! মোঃ নজরুল ইসলামের এআই এসিস্ট্যান্টে আপনাকে স্বাগতম। আলহামদুলিল্লাহ আমি চমৎকার আছি!\n\n" +
+          "আমি আপনাকে ওনার কারিগরি দক্ষতা, প্রজেক্ট বাজেট ট্র্যাকিং, কিংবা অ্যান্ড্রোয়েড এবং আইওটি প্রজেক্ট সম্পর্কে যেকোনো জিজ্ঞাসা সমাধান করতে সাহায্য করব। বলুন, আজ কীভাবে সাহায্য করতে পারি?";
+      } else {
+        return "Hello and welcome to Md. Nazrul's official AI assistant panel!\n\n" +
+          "I can gladly explain Nazrul's tech stack, help you estimate costs for your custom app, clarify his BLE IoT projects, or facilitate direct contact. What's on your mind?";
+      }
+    }
+
+    // 6. Generic Fallback
+    if (isBengali) {
+      return "আমি মোঃ নজরুল ইসলামের অফিশিয়াল পোর্টফোলিও পার্টনার। আপনার বার্তাটির জন্য অনেক ধন্যবাদ!\n\n" +
+        "আপনার জিজ্ঞাসাটি ওনার জন্য অত্যন্ত মূল্যবান। সংক্ষেপে ওনার প্রধান সেবাগুলো নিচে দেখুন:\n\n" +
+        "🛠️ **মূল স্পেশালিটি**: রেসপন্সিভ Next.js ওয়েব পোর্টাল ও Kotlin অ্যান্ড্রয়েড আইওটি (Agro/Soil sensors, BLE) পোর্টাল।\n" +
+        "💳 **বাজেট**: কাস্টম ওয়েবসাইট ডিজাইন ১২,০০০ টাকা ও কোটলিন মোবাইল অ্যাপস ১৬,০৫০ টাকা থেকে শুরু।\n" +
+        "📞 **সহজ চ্যাট**: আরো ক্লিয়ার আলোচনার জন্য ওনার সাথে সরাসরি লিঙ্ক বা হোয়াটসঅ্যাপে নক দিতে পারেন: [+৮৮০১৭৯৩৮৪০৭৬২](https://wa.me/8801793840762)";
+    } else {
+      return "I am Md. Nazrul's Portfolio Partner. Thank you for your message!\n\n" +
+        "To quickly guide your exploration, here are high-quality highlights of Nazrul's services:\n\n" +
+        "🛠️ **Fields of Practice**: Responsive fullstack Next.js client systems, Kotlin Native Android APKs, and Embedded BLE agricultural logging telemetry.\n" +
+        "💳 **Pricing**: Dynamic websites starting at ৳12,000 BDT, mobile systems at ৳16,050 BDT.\n" +
+        "📞 **Direct Support**: Message him on WhatsApp anytime to discuss your specs: [+8801793840762](https://wa.me/8801793840762)! Our team will reply shortly.";
+    }
+  };
+
   const handleSendMessage = async (textToSend: string) => {
     if (!textToSend.trim() || loading) return;
 
@@ -45,7 +206,12 @@ export default function AIAssistant() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to receive feedback from server proxy.");
+        throw new Error("HTTP_ERROR");
+      }
+
+      const contentType = response.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        throw new Error("HTML_RECEIVED_FALLBACK");
       }
 
       const data = await response.json();
@@ -55,8 +221,16 @@ export default function AIAssistant() {
 
       setMessages((prev) => [...prev, { role: "assistant", content: data.text || "I was unable to formulate a response. Please try again." }]);
     } catch (err: any) {
-      console.error("AI Assistant error:", err);
-      setErrorStatus(err.message || "Connection timed out. Please try again later.");
+      console.warn("[AIAssistant] Server chat handler hit SPA fallback, or API key not verified. Switching instantly to on-device smart matcher:", err);
+      
+      // Delay response slightly to simulate human-like reasoning/thought processing
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      
+      const localResult = calculateLocalResponse(textToSend.trim());
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: localResult },
+      ]);
     } finally {
       setLoading(false);
     }
