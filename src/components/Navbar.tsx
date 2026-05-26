@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, ShieldAlert, Laptop, Briefcase, Phone, ChevronRight } from "lucide-react";
+import { Menu, X, ShieldAlert, Laptop, Briefcase, Phone, ChevronRight, Github, Facebook, Linkedin, MessageCircle } from "lucide-react";
 import StylishLogo from "./StylishLogo";
 
 interface NavbarProps {
@@ -51,6 +51,53 @@ export default function Navbar({ currentView, setView, isAdmin, onLogout }: Navb
                 </button>
               );
             })}
+
+            {/* Divider */}
+            <div className="h-5 w-px bg-slate-800 mx-3 hidden lg:block" />
+
+            {/* Direct Social Links with premium micro-hovers */}
+            <div className="hidden lg:flex items-center gap-1.5 mr-2">
+              <a
+                href="https://github.com/dev-nazrul-bd"
+                target="_blank"
+                rel="noreferrer"
+                id="header-social-github"
+                className="w-8 h-8 rounded-lg bg-slate-800/40 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/30 flex items-center justify-center text-slate-400 hover:text-indigo-400 transition-all"
+                title="GitHub Profile"
+              >
+                <Github className="w-4 h-4" />
+              </a>
+              <a
+                href="https://www.linkedin.com/in/md-nazrul-islam-482722411"
+                target="_blank"
+                rel="noreferrer"
+                id="header-social-linkedin"
+                className="w-8 h-8 rounded-lg bg-slate-800/40 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/30 flex items-center justify-center text-slate-400 hover:text-indigo-400 transition-all"
+                title="LinkedIn Profile"
+              >
+                <Linkedin className="w-4 h-4" />
+              </a>
+              <a
+                href="https://www.facebook.com/4nazrul.islam"
+                target="_blank"
+                rel="noreferrer"
+                id="header-social-facebook"
+                className="w-8 h-8 rounded-lg bg-slate-800/40 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/30 flex items-center justify-center text-slate-400 hover:text-indigo-400 transition-all"
+                title="Facebook Connect"
+              >
+                <Facebook className="w-4 h-4" />
+              </a>
+              <a
+                href="https://wa.me/8801793840762"
+                target="_blank"
+                rel="noreferrer"
+                id="header-social-whatsapp"
+                className="w-8 h-8 rounded-lg bg-slate-800/40 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/30 flex items-center justify-center text-slate-400 hover:text-emerald-400 transition-all"
+                title="WhatsApp Direct Msg"
+              >
+                <MessageCircle className="w-4 h-4" />
+              </a>
+            </div>
 
             {/* Admin toggle shown ONLY if user is already logged in or visiting admin directly */}
             {(isAdmin || currentView === "admin") && (

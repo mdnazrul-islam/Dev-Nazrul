@@ -84,6 +84,31 @@
         }
       },
       "required": ["name", "email", "message", "createdAt"]
+    },
+    "GuestbookComment": {
+      "title": "Guestbook Signature",
+      "description": "A public dynamic signature left on the developer guestbook wall",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the signatory"
+        },
+        "role": {
+          "type": "string",
+          "description": "Role of the signatory (e.g., Client, Fellow Developer, Recruiter)"
+        },
+        "message": {
+          "type": "string",
+          "description": "Greeting or encouraging message"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Signature timestamp"
+        }
+      },
+      "required": ["name", "role", "message", "createdAt"]
     }
   },
   "firestore": {
@@ -94,6 +119,10 @@
     "messages/{messageId}": {
       "schema": "Message",
       "description": "Inquiries and contact messages sent by clients"
+    },
+    "guestbook/{commentId}": {
+      "schema": "GuestbookComment",
+      "description": "Public guestbook signature posts"
     }
   }
 }

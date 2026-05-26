@@ -8,7 +8,12 @@ import ProjectCard from "./components/ProjectCard";
 import ProjectDetailView from "./components/ProjectDetailView";
 import ContactForm from "./components/ContactForm";
 import AdminPanel from "./components/AdminPanel";
-import { Laptop, Briefcase, Phone, Settings, ShieldAlert, Cpu, Heart, Code, Sparkles, MapPin, Layers, Loader2 } from "lucide-react";
+import SkillsMatrix from "./components/SkillsMatrix";
+import WorkTimeline from "./components/WorkTimeline";
+import ServicesPricing from "./components/ServicesPricing";
+import Guestbook from "./components/Guestbook";
+import AIAssistant from "./components/AIAssistant";
+import { Laptop, Briefcase, Phone, Settings, ShieldAlert, Cpu, Heart, Code, Sparkles, MapPin, Layers, Loader2, Github, Facebook, Linkedin, MessageCircle } from "lucide-react";
 
 export default function App() {
   const [currentView, setView] = useState<string>("home");
@@ -274,6 +279,26 @@ export default function App() {
                     </div>
                   </div>
                 </div>
+
+                {/* Skills Matrix Panel */}
+                <div id="skills-matrix-container" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                  <SkillsMatrix />
+                </div>
+
+                {/* RoadMap Career Milestones Timeline */}
+                <div id="work-timeline-container" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                  <WorkTimeline />
+                </div>
+
+                {/* Collaboration Offerings & Dynamic Cost Estimator */}
+                <div id="services-pricing-container" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                  <ServicesPricing />
+                </div>
+
+                {/* Dynamic Signature wall Guestbook */}
+                <div id="guestbook-container" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
+                  <Guestbook isAdmin={isAdminLoggedIn} />
+                </div>
               </div>
             )}
 
@@ -356,35 +381,47 @@ export default function App() {
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
               <span className="text-[10px] text-slate-505 uppercase block">Direct Links:</span>
               <a 
-                href="https://www.facebook.com/4nazrul.islam" 
+                href="https://github.com/dev-nazrul-bd" 
                 target="_blank" 
                 rel="noreferrer" 
-                className="hover:text-indigo-400 transition-colors"
+                className="hover:text-indigo-405 transition-colors inline-flex items-center gap-1.5 font-sans font-medium text-slate-300 hover:underline"
               >
-                Facebook
+                <Github className="w-3.5 h-3.5 text-indigo-400" />
+                GitHub
               </a>
               <a 
                 href="https://www.linkedin.com/in/md-nazrul-islam-482722411" 
                 target="_blank" 
                 rel="noreferrer" 
-                className="hover:text-indigo-400 transition-colors"
+                className="hover:text-indigo-405 transition-colors inline-flex items-center gap-1.5 font-sans font-medium text-slate-300 hover:underline"
               >
+                <Linkedin className="w-3.5 h-3.5 text-indigo-450" />
                 LinkedIn
+              </a>
+              <a 
+                href="https://www.facebook.com/4nazrul.islam" 
+                target="_blank" 
+                rel="noreferrer" 
+                className="hover:text-indigo-405 transition-colors inline-flex items-center gap-1.5 font-sans font-medium text-slate-300 hover:underline"
+              >
+                <Facebook className="w-3.5 h-3.5 text-indigo-400" />
+                Facebook
               </a>
               <a 
                 href="https://wa.me/8801793840762" 
                 target="_blank" 
                 rel="noreferrer" 
-                className="hover:text-emerald-400 transition-colors flex items-center gap-1"
+                className="hover:text-emerald-450 transition-colors inline-flex items-center gap-1.5 font-sans font-medium text-slate-300 hover:underline"
               >
+                <MessageCircle className="w-3.5 h-3.5 text-emerald-450" />
                 WhatsApp
               </a>
               <button 
                 onClick={() => navigateToRoute("admin")}
-                className="hover:text-indigo-400 text-slate-500 transition-colors flex items-center gap-1 cursor-pointer font-bold bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-lg hover:border-indigo-500/25 transition-all text-[11px]"
+                className="hover:text-indigo-400 text-slate-350 transition-colors flex items-center gap-1 cursor-pointer font-bold bg-slate-900 border border-slate-800 px-2.5 py-1.5 rounded-lg hover:border-indigo-505 transition-all text-[11px]"
               >
                 🔐 Admin Console
               </button>
@@ -399,6 +436,9 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      {/* Embedded Floating AI Advisor Expert Drawer */}
+      <AIAssistant />
 
     </div>
   );
