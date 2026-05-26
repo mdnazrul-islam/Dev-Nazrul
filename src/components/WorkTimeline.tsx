@@ -75,7 +75,7 @@ export default function WorkTimeline() {
         <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] font-mono font-bold tracking-wider uppercase">
           <Milestone className="w-3 h-3" /> Career Milestones
         </div>
-        <h3 className="font-sans font-extrabold text-xl sm:text-2xl text-white tracking-tight">Professional Roadmap & Journey</h3>
+        <h3 className="font-sans font-extrabold text-xl sm:text-2xl text-slate-100 tracking-tight">Professional Roadmap & Journey</h3>
         <p className="text-xs text-slate-400 max-w-lg font-sans">
           A track record of technological achievements, key project deployments, and complex engineering solutions.
         </p>
@@ -101,7 +101,7 @@ export default function WorkTimeline() {
                   <span className="text-[10px] font-mono uppercase bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800/80 text-indigo-300 font-extrabold">
                     {ms.year}
                   </span>
-                  <h4 className="font-sans font-bold text-xs truncate mt-1 text-white">{ms.role}</h4>
+                  <h4 className="font-sans font-bold text-xs truncate mt-1 text-slate-100">{ms.role}</h4>
                 </div>
               </button>
             );
@@ -117,7 +117,7 @@ export default function WorkTimeline() {
                 <span className="text-xs font-mono text-indigo-400 tracking-wider">
                   {milestones[selectedMilestone].year}
                 </span>
-                <h3 className="font-sans font-extrabold text-lg text-white">
+                <h3 className="font-sans font-extrabold text-lg text-slate-100">
                   {milestones[selectedMilestone].role}
                 </h3>
                 <p className="text-xs text-slate-400 flex items-center gap-1 font-mono">

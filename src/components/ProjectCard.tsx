@@ -14,7 +14,7 @@ export default function ProjectCard({ project, onSelection }: ProjectCardProps) 
   return (
     <div
       id={`project-card-${project.id || "temp"}`}
-      className="group bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:border-indigo-500/40 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all duration-300 flex flex-col h-full text-white cursor-pointer"
+      className="group bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:border-indigo-500/40 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all duration-300 flex flex-col h-full text-slate-100 cursor-pointer"
       onClick={() => onSelection(project)}
     >
       {/* Cloudinary Image Frame with Hover Zoom */}
@@ -54,7 +54,7 @@ export default function ProjectCard({ project, onSelection }: ProjectCardProps) 
       <div className="p-5 flex-1 flex flex-col justify-between">
         <div className="space-y-3">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-sans font-bold text-lg text-white group-hover:text-indigo-400 transition-colors line-clamp-1 leading-snug">
+            <h3 className="font-sans font-bold text-lg text-slate-100 group-hover:text-indigo-400 transition-colors line-clamp-1 leading-snug">
               {project.title}
             </h3>
             <ArrowUpRight className="w-4 h-4 text-slate-500 group-hover:text-indigo-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all flex-shrink-0" />

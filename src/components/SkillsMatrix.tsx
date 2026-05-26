@@ -66,7 +66,7 @@ export default function SkillsMatrix() {
           <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] font-mono font-bold tracking-wider uppercase">
             <Cpu className="w-3 h-3" /> Toolset Matrix
           </div>
-          <h3 className="font-sans font-extrabold text-xl sm:text-2xl text-white tracking-tight">Technical Mastery & Stack</h3>
+          <h3 className="font-sans font-extrabold text-xl sm:text-2xl text-slate-100 tracking-tight">Technical Mastery & Stack</h3>
           <p className="text-xs text-slate-400 max-w-lg font-sans">
             A comprehensive, interactive analysis of my software engineering capabilities and real-world technology proficiencies.
           </p>
@@ -111,7 +111,7 @@ export default function SkillsMatrix() {
                 {cat.skills.map((skill, index) => (
                   <div key={index} className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs font-mono">
-                      <span className="text-white font-bold">{skill.name}</span>
+                      <span className="text-slate-100 font-bold">{skill.name}</span>
                       <span className="text-indigo-400 font-extrabold">{skill.level}%</span>
                     </div>
                     {/* Visual Bar tracks */}

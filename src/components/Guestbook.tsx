@@ -145,7 +145,7 @@ export default function Guestbook({ isAdmin = false }: GuestbookProps) {
           <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-indigo-505/10 text-indigo-400 border border-indigo-500/20 text-[10px] font-mono font-bold tracking-wider uppercase">
             <Users className="w-3.5 h-3.5" /> Signatures Map
           </div>
-          <h3 className="font-sans font-extrabold text-xl sm:text-2xl text-white tracking-tight">Virtual Guestbook Wall</h3>
+          <h3 className="font-sans font-extrabold text-xl sm:text-2xl text-slate-100 tracking-tight">Virtual Guestbook Wall</h3>
           <p className="text-xs text-slate-400 font-sans leading-normal">
             Leave an encouraging word, share a greeting, or endorse my skills. Your feedback will stream instantly on the signature wall!
           </p>
@@ -163,7 +163,7 @@ export default function Guestbook({ isAdmin = false }: GuestbookProps) {
               placeholder="e.g. Sabrina Chowdhury"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full bg-slate-950/80 border border-slate-800 focus:border-indigo-500 text-white rounded-xl px-3 py-2 text-xs outline-none font-sans"
+              className="w-full bg-slate-950/80 border border-slate-800 focus:border-indigo-500 text-slate-100 rounded-xl px-3 py-2 text-xs outline-none font-sans"
             />
           </div>
 
@@ -172,7 +172,7 @@ export default function Guestbook({ isAdmin = false }: GuestbookProps) {
             <select 
               value={role}
               onChange={(e) => setRole(e.target.value)}
-              className="w-full bg-slate-950/80 border border-slate-800 focus:border-indigo-500 text-white rounded-xl px-3 py-2 text-xs outline-none font-sans cursor-pointer"
+              className="w-full bg-slate-950/80 border border-slate-800 focus:border-indigo-500 text-slate-100 rounded-xl px-3 py-2 text-xs outline-none font-sans cursor-pointer"
             >
               <option value="Visitor">General Visitor</option>
               <option value="Client">Client</option>
@@ -190,7 +190,7 @@ export default function Guestbook({ isAdmin = false }: GuestbookProps) {
               placeholder="Write a message or testimonial..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="w-full bg-slate-950/80 border border-slate-800 focus:border-indigo-500 text-white rounded-xl px-3 py-2 text-xs outline-none font-sans resize-none"
+              className="w-full bg-slate-950/80 border border-slate-800 focus:border-indigo-500 text-slate-100 rounded-xl px-3 py-2 text-xs outline-none font-sans resize-none"
             />
           </div>
 
@@ -230,7 +230,7 @@ export default function Guestbook({ isAdmin = false }: GuestbookProps) {
         <div className="flex items-center justify-between border-b border-slate-900 pb-3 mb-4">
           <div className="flex items-center gap-2">
             <MessageSquare className="w-4 h-4 text-indigo-400" />
-            <h4 className="font-sans font-extrabold text-sm text-white uppercase tracking-wider">Signatures Wall</h4>
+            <h4 className="font-sans font-extrabold text-sm text-slate-100 uppercase tracking-wider">Signatures Wall</h4>
           </div>
           <span className="text-[10px] font-mono text-slate-400">
             Showcasing {activeCommentsList.length} recent signatures
@@ -252,7 +252,7 @@ export default function Guestbook({ isAdmin = false }: GuestbookProps) {
                 {/* Upper Metadata alignment */}
                 <div className="flex items-start justify-between gap-4 mb-2">
                   <div className="space-y-0.5">
-                    <span className="font-sans font-extrabold text-xs text-white block">
+                    <span className="font-sans font-extrabold text-xs text-slate-100 block">
                       {comment.name}
                     </span>
                     <span className={`inline-block px-2 py-0.5 rounded-full text-[9px] font-mono font-bold border ${getRoleBadgeColor(comment.role)}`}>

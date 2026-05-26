@@ -308,7 +308,7 @@ export default function App() {
   const activeThemeObj = AVAILABLE_THEMES.find(t => t.id === theme) || AVAILABLE_THEMES[0];
 
   return (
-    <div id="app-root-container" className="relative min-h-screen text-white flex flex-col justify-between selection:bg-indigo-600/30 overflow-x-hidden">
+    <div id="app-root-container" className="relative min-h-screen text-slate-100 flex flex-col justify-between selection:bg-indigo-600/30 overflow-x-hidden">
       
       {/* Dynamic blurred backdrop image/graphic layer */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none">
@@ -382,7 +382,7 @@ export default function App() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
                   <div className="text-center md:text-left space-y-1">
                     <span className="text-[10px] uppercase font-mono tracking-wider text-indigo-400 font-extrabold">Professional Showcase</span>
-                    <h2 className="font-sans font-extrabold text-2xl sm:text-3xl tracking-tight text-white">Featured Builds</h2>
+                    <h2 className="font-sans font-extrabold text-2xl sm:text-3xl tracking-tight text-slate-100">Featured Builds</h2>
                     <p className="text-sm text-slate-400 max-w-xl font-sans">
                       A list of top hand-tailored web services and native apps compiled for production runtime.
                     </p>
@@ -451,11 +451,6 @@ export default function App() {
                 {/* RoadMap Career Milestones Timeline */}
                 <div id="work-timeline-container" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <WorkTimeline />
-                </div>
-
-                {/* Collaboration Offerings & Dynamic Cost Estimator */}
-                <div id="services-pricing-container" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                  <ServicesPricing />
                 </div>
 
                 {/* Dynamic Signature wall Guestbook */}
@@ -552,7 +547,7 @@ export default function App() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             
             <div className="space-y-1.5">
-              <span className="font-sans font-bold text-white text-base block leading-none">Md. Nazrul Islam</span>
+              <span className="font-sans font-bold text-slate-100 text-base block leading-none">Md. Nazrul Islam</span>
               <p className="text-xs text-slate-400 block font-sans">Full-stack Software & Android Developer</p>
               <p className="text-[10px] text-slate-505 block leading-normal pt-1 break-all max-w-sm">
                 Inquiries: <a href="mailto:nazrul.islam.uli019@gmail.com" className="text-indigo-400 hover:underline">nazrul.islam.uli019@gmail.com</a>

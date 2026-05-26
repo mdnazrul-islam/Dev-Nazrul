@@ -18,7 +18,7 @@ export default function Hero({ onExploreProjects, onContactMe }: HeroProps) {
   ];
 
   return (
-    <div id="hero-section" className="relative overflow-hidden bg-radial from-slate-900 via-slate-950 to-black text-white py-16 sm:py-24 border-b border-slate-800">
+    <div id="hero-section" className="relative overflow-hidden bg-slate-950 text-slate-100 py-16 sm:py-24 border-b border-slate-800">
       
       {/* Visual background lights */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -37,7 +37,7 @@ export default function Hero({ onExploreProjects, onContactMe }: HeroProps) {
                   <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
                   AVAILABLE FOR PROFESSIONAL PROJECTS
                 </div>
-                <h1 className="font-sans font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-none bg-gradient-to-r from-white via-indigo-155 to-indigo-400 bg-clip-text text-transparent">
+                <h1 className="font-sans font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-none bg-gradient-to-r from-slate-100 via-indigo-155 to-indigo-400 bg-clip-text text-transparent">
                   Dev Nazrul
                 </h1>
                 <p className="font-sans text-xl text-indigo-455 font-bold tracking-wide">
@@ -81,7 +81,7 @@ export default function Hero({ onExploreProjects, onContactMe }: HeroProps) {
               </button>
               <button
                 onClick={onContactMe}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold px-8 py-3.5 rounded-xl border border-slate-700 transition-all cursor-pointer"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 transition-all cursor-pointer"
               >
                 Get In Touch
               </button>

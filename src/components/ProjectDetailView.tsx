@@ -89,7 +89,7 @@ export default function ProjectDetailView({ project, onBack }: ProjectDetailView
   };
 
   return (
-    <div id="project-detail-view" className="bg-slate-950 text-white min-h-screen py-10 px-4 sm:px-6 lg:px-8">
+    <div id="project-detail-view" className="bg-slate-950 text-slate-100 min-h-screen py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto space-y-8">
         
         {/* Back navigation anchor */}
@@ -104,7 +104,7 @@ export default function ProjectDetailView({ project, onBack }: ProjectDetailView
         {/* Title and Category Section */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-800">
           <div>
-            <h1 className="font-sans font-extrabold text-3xl sm:text-4xl tracking-tight text-white mb-2">
+            <h1 className="font-sans font-extrabold text-3xl sm:text-4xl tracking-tight text-slate-100 mb-2">
               {project.title}
             </h1>
             <p className="font-mono text-xs text-indigo-400 tracking-wide">

@@ -139,7 +139,7 @@ Please let me know your availability to discuss further!`;
             <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] font-mono font-bold tracking-wider uppercase">
               <Zap className="w-3 h-3" /> Collaboration Offerings
             </div>
-            <h3 className="font-sans font-extrabold text-xl sm:text-2xl text-white tracking-tight">Services & Professional Standards</h3>
+            <h3 className="font-sans font-extrabold text-xl sm:text-2xl text-slate-100 tracking-tight">Services & Professional Standards</h3>
             <p className="text-xs text-slate-400 font-sans">
               Guaranteed high-performance deliverables designed to scale and optimize conversion rates.
             </p>
@@ -152,7 +152,7 @@ Please let me know your availability to discuss further!`;
                 <span className="font-sans font-extrabold text-xs tracking-wider uppercase text-indigo-400">01. Web App Specialist</span>
                 <span className="text-[10px] font-mono text-slate-450 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">Next.js / React</span>
               </div>
-              <h4 className="font-sans font-bold text-sm text-white mb-1">Full-Stack Cloud Portals</h4>
+              <h4 className="font-sans font-bold text-sm text-slate-100 mb-1">Full-Stack Cloud Portals</h4>
               <p className="text-xs text-slate-400 leading-normal font-sans">
                 Production-ready single page systems loaded with seamless local/cloud synchronization pipelines, image-compression and interactive tables.
               </p>
@@ -163,7 +163,7 @@ Please let me know your availability to discuss further!`;
                 <span className="font-sans font-extrabold text-xs tracking-wider uppercase text-indigo-400">02. Mobile App Specialist</span>
                 <span className="text-[10px] font-mono text-slate-455 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">Kotlin / React Native</span>
               </div>
-              <h4 className="font-sans font-bold text-sm text-white mb-1">Android IoT Telemetry APKs</h4>
+              <h4 className="font-sans font-bold text-sm text-slate-100 mb-1">Android IoT Telemetry APKs</h4>
               <p className="text-xs text-slate-400 leading-normal font-sans">
                 Native SDK configurations paired with BLE telemetry monitors, bluetooth adapters integrations, and high-performance offline SQLite buffers.
               </p>
@@ -174,7 +174,7 @@ Please let me know your availability to discuss further!`;
                 <span className="font-sans font-extrabold text-xs tracking-wider uppercase text-indigo-400">03. Database Specialist</span>
                 <span className="text-[10px] font-mono text-slate-455 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">Serverless & Rules Auditing</span>
               </div>
-              <h4 className="font-sans font-bold text-sm text-white mb-1">Secure Systems Architecture</h4>
+              <h4 className="font-sans font-bold text-sm text-slate-100 mb-1">Secure Systems Architecture</h4>
               <p className="text-xs text-slate-400 leading-normal font-sans">
                 Firebase configuration setups, zero-trust granular access control rules, robust express routes mapping, and security auditing logs.
               </p>
@@ -186,7 +186,7 @@ Please let me know your availability to discuss further!`;
         <div className="w-full xl:w-1/2 bg-slate-900/50 border border-slate-850 p-6 sm:p-8 rounded-2xl flex flex-col justify-between space-y-6 text-left">
           <div className="space-y-4">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h4 className="font-sans font-extrabold text-sm text-white uppercase tracking-wider flex items-center gap-1.5">
+              <h4 className="font-sans font-extrabold text-sm text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
                 <Landmark className="w-4 h-4 text-emerald-400" /> Dynamic Quote Planner
               </h4>
               <span className="text-[9px] font-mono uppercase bg-indigo-500/10 text-indigo-300 px-2 py-0.5 border border-indigo-500/20 rounded">
@@ -223,7 +223,7 @@ Please let me know your availability to discuss further!`;
                   <span className="text-slate-400">
                     {service === "android" ? "Feature Modules / Views:" : service === "backend" ? "Database Collections:" : "Quantity of Layout Pages:"}
                   </span>
-                  <span className="text-white font-extrabold bg-slate-900 px-2 py-0.5 border border-slate-800 rounded">{pagesCount}</span>
+                  <span className="text-slate-100 font-extrabold bg-slate-900 px-2 py-0.5 border border-slate-800 rounded">{pagesCount}</span>
                 </div>
                 <input 
                   type="range" 
