@@ -134,13 +134,13 @@ export default function Guestbook({ isAdmin = false }: GuestbookProps) {
   const activeCommentsList = comments.length > 0 ? comments : templateComments;
 
   return (
-    <div id="guestbook-element-root" className="grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+    <div id="guestbook-element-root" className="flex flex-col xl:flex-row gap-8 relative z-10 items-stretch">
       
       {/* Visual glowing aura */}
       <div className="absolute top-1/4 right-1/4 w-80 h-80 bg-indigo-505/5 rounded-full blur-3xl pointer-events-none" />
 
       {/* Grid Left Column: Signature submission form */}
-      <div className="lg:col-span-4 space-y-4">
+      <div className="w-full xl:w-1/3 space-y-4">
         <div className="space-y-1">
           <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-indigo-505/10 text-indigo-400 border border-indigo-500/20 text-[10px] font-mono font-bold tracking-wider uppercase">
             <Users className="w-3.5 h-3.5" /> Signatures Map
@@ -226,7 +226,7 @@ export default function Guestbook({ isAdmin = false }: GuestbookProps) {
       </div>
 
       {/* Grid Right Column: Signatures scroll wall */}
-      <div className="lg:col-span-8 flex flex-col h-[420px] bg-slate-950/50 border border-slate-850 rounded-2xl p-5 sm:p-6 text-left">
+      <div className="w-full xl:w-2/3 flex flex-col h-[420px] bg-slate-950/50 border border-slate-850 rounded-2xl p-5 sm:p-6 text-left">
         <div className="flex items-center justify-between border-b border-slate-900 pb-3 mb-4">
           <div className="flex items-center gap-2">
             <MessageSquare className="w-4 h-4 text-indigo-400" />

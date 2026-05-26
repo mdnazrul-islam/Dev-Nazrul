@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, ShieldAlert, Laptop, Briefcase, Phone, ChevronRight, Github, Facebook, Linkedin, MessageCircle } from "lucide-react";
+import { Menu, X, ShieldAlert, Laptop, Briefcase, Phone, ChevronRight, Github, Facebook, Linkedin, MessageCircle, Landmark } from "lucide-react";
 import StylishLogo from "./StylishLogo";
 
 interface NavbarProps {
@@ -15,6 +15,7 @@ export default function Navbar({ currentView, setView, isAdmin, onLogout }: Navb
   const navItems = [
     { id: "home", label: "Home", icon: Laptop },
     { id: "gallery", label: "Projects", icon: Briefcase },
+    { id: "budget", label: "Budget", icon: Landmark },
     { id: "contact", label: "Contact", icon: Phone },
   ];
 

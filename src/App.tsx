@@ -134,6 +134,15 @@ export default function App() {
       ) {
         setView("contact");
         setActiveProject(null);
+      } else if (
+        pathname === "/budget" || 
+        pathname === "/budget/" || 
+        hash === "#/budget" || 
+        hash === "#budget" || 
+        queryView === "budget"
+      ) {
+        setView("budget");
+        setActiveProject(null);
       } else if (cleanPath !== "" && cleanPath !== "home") {
         // Lookups will be executed once the projects are sync loaded
       } else {
@@ -179,6 +188,11 @@ export default function App() {
   // Combined source: combines standard Firestore rows with templates for a full catalog
   const allProjects = databaseProjects.length > 0 ? databaseProjects : baselineTemplateProjects;
 
+  // Scroll to top of window whenever the active view or selected project details changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [currentView, activeProject]);
+
   // Listen to load completion of projects to trigger custom layout matches
   useEffect(() => {
     if (allProjects.length > 0) {
@@ -192,6 +206,7 @@ export default function App() {
         cleanPath !== "admin" && 
         cleanPath !== "gallery" && 
         cleanPath !== "contact" && 
+        cleanPath !== "budget" && 
         cleanPath !== "home"
       ) {
         const matched = allProjects.find(
@@ -413,6 +428,21 @@ export default function App() {
             {currentView === "contact" && (
               <div id="contact-view" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 animate-fade-in">
                 <ContactForm />
+              </div>
+            )}
+
+            {/* View: Dedicated Services & Budget Estimator Section */}
+            {currentView === "budget" && (
+              <div id="budget-view" className="max-w-3xl mx-auto px-4 sm:px-6 py-16 animate-fade-in space-y-8">
+                <div className="text-center space-y-2">
+                  <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-white tracking-tight">Interactive Budget Planner</h2>
+                  <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto font-sans leading-relaxed">
+                    Get an instant cost assessment mapping to your system specifications. All rates are configured in real-time.
+                  </p>
+                </div>
+                <div className="pt-6">
+                  <ServicesPricing />
+                </div>
               </div>
             )}
 

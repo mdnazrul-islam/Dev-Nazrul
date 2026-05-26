@@ -1173,11 +1173,16 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
       {/* Tab: CDN Configuration Settings manager */}
       {activeTab === "settings" && (
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-8 animate-fade-in">
-          <div className="border-b border-slate-850 pb-4">
-            <h4 className="font-sans font-extrabold text-xl text-white">Cloudinary CDN Settings</h4>
-            <p className="text-slate-400 text-xs font-mono mt-1">
-              Customize storage variables below for smooth background media streaming and layouts.
-            </p>
+          <div className="border-b border-slate-850 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h4 className="font-sans font-extrabold text-xl text-white">Cloudinary CDN Settings</h4>
+              <p className="text-slate-400 text-xs font-mono mt-1">
+                Customize storage variables below for smooth background media streaming and layouts.
+              </p>
+            </div>
+            <span className="inline-flex self-start sm:self-center items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-505/20 text-[10px] font-mono font-bold tracking-wider uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-455 animate-pulse" /> SIMULATED TRACKER
+            </span>
           </div>
 
           {/* Real-time CDN Storage Status visualizer Widget */}
