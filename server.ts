@@ -12,15 +12,48 @@ const PORT = 3000;
 async function bootstrap() {
   const app = express();
 
-  // Initialize Google GenAI client
-  const ai = new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY,
-    httpOptions: {
-      headers: {
-        "User-Agent": "aistudio-build",
+  // Resolve the actual API key from process env (supports standard and user-defined variants)
+  const getGeminiApiKey = () => {
+    // 1. Check GEMINI_API_KEY
+    if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim()) {
+      return process.env.GEMINI_API_KEY.trim();
+    }
+    // 2. Check the custom key 'GE' shown in the user's screenshot
+    if (process.env.GE && process.env.GE.trim()) {
+      return process.env.GE.trim();
+    }
+    // 3. Auto-detect any environment variable starting with 'AIzaSy' (standard Google API Key signature)
+    for (const [key, value] of Object.entries(process.env)) {
+      if (typeof value === "string") {
+        const cleanVal = value.trim();
+        if (cleanVal.startsWith("AIzaSy")) {
+          console.log(`[LAZY CLIENT] Auto-detected Gemini Key in environment variable: ${key}`);
+          return cleanVal;
+        }
+      }
+    }
+    // 4. Look for keys containing "GEMINI"
+    for (const [key, value] of Object.entries(process.env)) {
+      if (key.toUpperCase().includes("GEMINI") && typeof value === "string" && value.trim()) {
+        return value.trim();
+      }
+    }
+    return null;
+  };
+
+  // Lazy initialize Google GenAI client inside request handler to prevent startup crashes when key is missing/delayed
+  const getAiClient = () => {
+    const key = getGeminiApiKey();
+    if (!key) return null;
+    return new GoogleGenAI({
+      apiKey: key,
+      httpOptions: {
+        headers: {
+          "User-Agent": "aistudio-build",
+        },
       },
-    },
-  });
+    });
+  };
 
   app.use(express.json());
 
@@ -32,13 +65,20 @@ async function bootstrap() {
         return res.status(400).json({ error: "Invalid messages payload or structure." });
       }
 
+      const client = getAiClient();
+      if (!client) {
+        return res.status(400).json({ 
+          error: "আসা-যাওয়া ত্রুটি: Gemini API Key সেট করা নেই। দয়া করে Settings > Secrets থেকে 'GEMINI_API_KEY' নামে সঠিক কি (Key) যোগ করুন এবং 'Apply changes' এ ক্লিক করুন।" 
+        });
+      }
+
       const systemInstruction = 
         "You are Dev Nazrul AI Expert, a helpful and professional AI coding assistant designed for Nazrul Islam's official developer portfolio website. " +
         "Your objective is to provide elite advice, explain Nazrul's skills, talk about pricing, suggest custom software solutions, and assist visitors with any programming inquiries. " +
         "Be professional, inspiring, and direct. Explain Nazrul's expertise with absolute pride. " +
         "Key Facts about Nazrul:\n" +
         "- Role: Lead Full-Stack Developer & Android IoT/Agro Systems Architect.\n" +
-        "- Key Stack: Next.js, React, Node.js + Express, Google Cloud Firestore, Zero-Trust Rules Auditing, and Kotlin Native Android SDK with Bluetooth Low Energy IoT telemetry.\n" +
+        "- Key Stack: Next.js, React, Node.js + Express, Google Cloud Firestore, Zero-Zero Rules Auditing, and Kotlin Native Android SDK with Bluetooth Low Energy IoT telemetry.\n" +
         "- Projects range from customized web portals, online e-commerce solutions, IoT agro sensors pairing, and smart agricultural apps.\n" +
         "- WhatsApp number: +8801793840762 (Direct link: https://wa.me/8801793840762).\n" +
         "- GitHub handle: https://github.com/dev-nazrul-bd.\n" +
@@ -57,7 +97,7 @@ async function bootstrap() {
       }));
 
       // Generate output text using gemini-3.5-flash
-      const response = await ai.models.generateContent({
+      const response = await client.models.generateContent({
         model: "gemini-3.5-flash",
         contents: formattedContents,
         config: {
@@ -70,7 +110,7 @@ async function bootstrap() {
     } catch (error: any) {
       console.error("Gemini Assistant request failed:", error);
       res.status(500).json({ 
-        error: "Our dynamic AI brain encountered an error. Please verify GEMINI_API_KEY in Secrets if running for the first time." 
+        error: "Our dynamic AI brain encountered an error (Gemini Assistant request failed). Please verify your Secrets in AI Studio have active status and are spelled correctly as GEMINI_API_KEY." 
       });
     }
   });
