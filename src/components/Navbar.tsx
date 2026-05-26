@@ -271,6 +271,7 @@ export default function Navbar({ currentView, setView, isAdmin, onLogout, theme,
                   key={t.id}
                   onClick={() => {
                     onThemeChange(t.id);
+                    setIsOpen(false);
                   }}
                   className={`flex flex-col items-center justify-center p-2 rounded-lg transition-all text-center border ${
                     theme === t.id

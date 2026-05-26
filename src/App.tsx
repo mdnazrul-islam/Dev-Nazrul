@@ -315,13 +315,13 @@ export default function App() {
         {/* Transparent blurred background representation */}
         <img 
           src={activeThemeObj.image} 
-          className="absolute inset-0 w-full h-full object-cover opacity-[0.07] sm:opacity-[0.11] blur-[24px] sm:blur-[32px] scale-105 transition-all duration-1000 ease-out pointer-events-none"
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.20] sm:opacity-[0.30] blur-[40px] sm:blur-[60px] scale-110 transition-all duration-1000 ease-out pointer-events-none"
           alt=""
           referrerPolicy="no-referrer"
         />
         
         {/* Floating Ambient Sun/Moon (For Light/Dark Theme) Or Big Atmospheric Fruit Emojis (For Fruits) */}
-        <div className="absolute top-1/4 right-1/10 lg:right-1/8 opacity-[0.04] sm:opacity-[0.08] pointer-events-none select-none transition-all duration-1000 transform scale-100 rotate-12">
+        <div className="absolute top-1/4 right-5 sm:right-[15%] opacity-[0.15] sm:opacity-[0.28] pointer-events-none select-none transition-all duration-1000 transform scale-110 rotate-12">
           {!activeThemeObj.isFruit ? (
             theme === "light" ? (
               <Sun className="w-80 h-80 text-orange-400 stroke-[1] animate-spin-slow" />
@@ -331,14 +331,14 @@ export default function App() {
           ) : (
             // Big beautifully-designed floating fruit element! Since we want it blurred slightly ("ঝাপসা হয়ে"),
             // we can render a gorgeous jumbo size emoji inside a blurred layer!
-            <div className="text-[17rem] leading-none select-none filter blur-[3px]">
+            <div className="text-[19rem] leading-none select-none filter blur-[1.5px] animate-pulse">
               {activeThemeObj.emoji}
             </div>
           )}
         </div>
         
         {/* Complementary ambient corner light source glow */}
-        <div className="absolute bottom-1/10 left-1/12 w-96 h-96 bg-indigo-500/5 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-1/10 left-1/12 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none" />
       </div>
 
       {/* Complete Header Bar */}
