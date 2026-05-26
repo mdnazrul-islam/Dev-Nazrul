@@ -3,6 +3,7 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
+import fs from "fs";
 
 dotenv.config();
 
@@ -74,19 +75,142 @@ async function bootstrap() {
     }
   });
 
-  // Setup Vite integration
+  // Dynamic slug helper
+  const slugify = (text: string) => {
+    return text
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  };
+
+  // Firestore REST fetching helper for SEO previews
+  const getProjectsForMeta = async () => {
+    try {
+      const res = await fetch("https://firestore.googleapis.com/v1/projects/dev-nazrul/databases/(default)/documents/projects");
+      if (!res.ok) throw new Error("Firestore REST request failed");
+      const data: any = await res.json();
+      if (!data.documents) return [];
+      
+      return data.documents.map((doc: any) => {
+        const fields = doc.fields || {};
+        return {
+          id: doc.name.split("/").pop(),
+          title: fields.title?.stringValue || "",
+          description: fields.description?.stringValue || "",
+          imageUrl: fields.imageUrl?.stringValue || "",
+        };
+      });
+    } catch (err) {
+      console.warn("Could not load dynamic projects for OG meta tagging. Using fallback:", err);
+      return [];
+    }
+  };
+
+  // Setup Vite integration & custom dynamic metadata handler
+  const distPath = path.join(process.cwd(), "dist");
+  
+  // Custom router to serve dynamically hydrated HTML for dynamic routes (both Dev & Prod)
+  const handleHtmlServing = async (req: any, res: any, next: any) => {
+    const urlPath = req.path;
+    
+    // Skip static assets or API routes
+    if (urlPath.includes(".") || urlPath.startsWith("/api")) {
+      return next();
+    }
+    
+    let cleanPath = urlPath;
+    if (cleanPath.startsWith("/")) cleanPath = cleanPath.slice(1);
+    if (cleanPath.endsWith("/")) cleanPath = cleanPath.slice(0, -1);
+    
+    const indexPath = process.env.NODE_ENV !== "production"
+      ? path.join(process.cwd(), "index.html")
+      : path.join(distPath, "index.html");
+      
+    if (!fs.existsSync(indexPath)) {
+      return res.status(404).send("Index workspace template not found");
+    }
+    
+    let html = fs.readFileSync(indexPath, "utf8");
+    
+    if (cleanPath !== "" && cleanPath !== "admin" && cleanPath !== "gallery" && cleanPath !== "contact" && cleanPath !== "home") {
+      try {
+        const projects = await getProjectsForMeta();
+        const matched = projects.find(
+          (p) => slugify(p.title) === cleanPath || p.id === cleanPath || (p.id && slugify(p.id) === cleanPath)
+        );
+        
+        if (matched) {
+          const titleEscaped = matched.title.replace(/"/g, "&quot;");
+          const descEscaped = matched.description.replace(/"/g, "&quot;").substring(0, 150) + "...";
+          const imageEscaped = matched.imageUrl.replace(/"/g, "&quot;");
+          
+          // Inject custom dynamic metadata tags
+          html = html.replace(/<title>.*?<\/title>/, `<title>${titleEscaped} | Dev Nazrul</title>`);
+          html = html.replace(/<meta name="title" content=".*?" \/>/g, `<meta name="title" content="${titleEscaped} | Dev Nazrul" />`);
+          
+          html = html.replace(/<meta property="og:title" content=".*?" \/>/g, `<meta property="og:title" content="${titleEscaped}" />`);
+          html = html.replace(/<meta property="og:description" content=".*?" \/>/g, `<meta property="og:description" content="${descEscaped}" />`);
+          html = html.replace(/<meta property="og:image" content=".*?" \/>/g, `<meta property="og:image" content="${imageEscaped}" />`);
+          
+          html = html.replace(/<meta property="twitter:title" content=".*?" \/>/g, `<meta property="twitter:title" content="${titleEscaped}" />`);
+          html = html.replace(/<meta property="twitter:description" content=".*?" \/>/g, `<meta property="twitter:description" content="${descEscaped}" />`);
+          html = html.replace(/<meta property="twitter:image" content=".*?" \/>/g, `<meta property="twitter:image" content="${imageEscaped}" />`);
+          
+          // Support standard fallback meta matches as well if tags differ in spacing
+          if (!html.includes(`content="${imageEscaped}"`)) {
+            const injectBlock = `
+              <title>${titleEscaped} | Dev Nazrul</title>
+              <meta property="og:title" content="${titleEscaped}" />
+              <meta property="og:description" content="${descEscaped}" />
+              <meta property="og:image" content="${imageEscaped}" />
+              <meta property="twitter:title" content="${titleEscaped}" />
+              <meta property="twitter:description" content="${descEscaped}" />
+              <meta property="twitter:image" content="${imageEscaped}" />
+            `;
+            html = html.replace("</head>", `${injectBlock}</head>`);
+          }
+        }
+      } catch (err) {
+        console.error("Meta tags generation error:", err);
+      }
+    }
+    
+    res.send(html);
+  };
+
   if (process.env.NODE_ENV !== "production") {
+    // We mount custom HTML middleware to custom match project routes
+    app.use("/@vite/client", (req, res, next) => next());
+    app.use("/node_modules", express.static(path.join(process.cwd(), "node_modules")));
+    app.use("/src", express.static(path.join(process.cwd(), "src")));
+    
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
     });
+    
+    // Serve HTML with custom dynamic meta tags FIRST if it's a dynamic slug
+    app.get("*", async (req, res, next) => {
+      const urlPath = req.path;
+      if (
+        urlPath === "/" || 
+        urlPath === "/admin" || 
+        urlPath === "/gallery" || 
+        urlPath === "/contact" || 
+        urlPath.includes(".") || 
+        urlPath.startsWith("/api")
+      ) {
+        return next();
+      }
+      return handleHtmlServing(req, res, next);
+    });
+
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), "dist");
+    // Production routing
     app.use(express.static(distPath));
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
-    });
+    app.get("*", handleHtmlServing);
   }
 
   app.listen(PORT, "0.0.0.0", () => {

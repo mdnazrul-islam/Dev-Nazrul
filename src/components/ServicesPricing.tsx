@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BadgeCheck, Sparkles, MessageSquare, Phone, Landmark, HelpCircle, ChevronRight, Zap } from "lucide-react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase";
 
 type ServiceType = "android" | "web" | "backend";
 
@@ -10,31 +12,85 @@ export default function ServicesPricing() {
   const [adminAddon, setAdminAddon] = useState<boolean>(false);
   const [securityAddon, setSecurityAddon] = useState<boolean>(true);
   const [costText, setCostText] = useState<number>(0);
+  const [unDiscountedCost, setUnDiscountedCost] = useState<number>(0);
 
-  // Calculated estimates
+  // Fallback baseline rates, to be sync updated if live Firebase document exists
+  const [rates, setRates] = useState({
+    webBase: 12000,
+    webMultiplier: 2500,
+    androidBase: 16050,
+    androidMultiplier: 3500,
+    backendBase: 8000,
+    backendMultiplier: 2000,
+    dbAddon: 5000,
+    adminAddon: 7500,
+    securityAddon: 4000,
+    discountPercentage: 20,
+    discountActive: true,
+    discountHeading: "অফার! বিশেষ প্রোমোショナル ডিসকাউন্ট উপলক্ষ্যে আকর্ষণীয় মূল্যছাড়!",
+  });
+
+  // Load dynamic rate states from Live Firebase on component mount
+  useEffect(() => {
+    const fetchLiveRates = async () => {
+      try {
+        const pricingDocRef = doc(db, "settings", "pricing");
+        const pricingSnap = await getDoc(pricingDocRef);
+        if (pricingSnap.exists()) {
+          const data = pricingSnap.data();
+          setRates({
+            webBase: Number(data.webBase ?? 12000),
+            webMultiplier: Number(data.webMultiplier ?? 2500),
+            androidBase: Number(data.androidBase ?? 16050),
+            androidMultiplier: Number(data.androidMultiplier ?? 3500),
+            backendBase: Number(data.backendBase ?? 8000),
+            backendMultiplier: Number(data.backendMultiplier ?? 2000),
+            dbAddon: Number(data.dbAddon ?? 5000),
+            adminAddon: Number(data.adminAddon ?? 7500),
+            securityAddon: Number(data.securityAddon ?? 4000),
+            discountPercentage: Number(data.discountPercentage ?? 20),
+            discountActive: data.discountActive ?? true,
+            discountHeading: data.discountHeading ?? "অফার! বিশেষ প্রোমোショナル ডিসকাউন্ট উপলক্ষ্যে আকর্ষণীয় মূল্যছাড়!",
+          });
+        }
+      } catch (err) {
+        console.warn("Could not query dynamic rates. Falling back to default baseline configurations.", err);
+      }
+    };
+    fetchLiveRates();
+  }, []);
+
+  // Calculated estimates based on fetched rates
   useEffect(() => {
     let baseRate = 0;
     let multiplier = 0;
 
     if (service === "web") {
-      baseRate = 12000;
-      multiplier = 2500; // per page
+      baseRate = rates.webBase;
+      multiplier = rates.webMultiplier;
     } else if (service === "android") {
-      baseRate = 16050;
-      multiplier = 3500; // per module
+      baseRate = rates.androidBase;
+      multiplier = rates.androidMultiplier;
     } else {
-      baseRate = 8000;
-      multiplier = 2000; // per database collection
+      baseRate = rates.backendBase;
+      multiplier = rates.backendMultiplier;
     }
 
     let calculated = baseRate + (pagesCount * multiplier);
 
-    if (dbAddon) calculated += 5000;
-    if (adminAddon) calculated += 7500;
-    if (securityAddon) calculated += 4000;
+    if (dbAddon) calculated += rates.dbAddon;
+    if (adminAddon) calculated += rates.adminAddon;
+    if (securityAddon) calculated += rates.securityAddon;
 
-    setCostText(calculated);
-  }, [service, pagesCount, dbAddon, adminAddon, securityAddon]);
+    setUnDiscountedCost(calculated);
+
+    if (rates.discountActive) {
+      const discount = Math.round((calculated * rates.discountPercentage) / 100);
+      setCostText(calculated - discount);
+    } else {
+      setCostText(calculated);
+    }
+  }, [service, pagesCount, dbAddon, adminAddon, securityAddon, rates]);
 
   const handleWhatsAppRoute = () => {
     const serviceLabels: Record<ServiceType, string> = {
@@ -64,7 +120,17 @@ Please let me know your availability to discuss further!`;
     <div id="services-pricing-section" className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
       
       {/* Glow highlight */}
-      <div className="absolute bottom-4 right-10 w-72 h-72 bg-indigo-505/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-4 right-10 w-72 h-72 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Dynamic Campaign Discount Header Announcement Banner */}
+      {rates.discountActive && (
+        <div className="col-span-12 bg-indigo-650/15 border border-indigo-500/25 p-4 rounded-xl flex items-center gap-3 animate-pulse text-indigo-300 font-sans text-xs sm:text-sm font-semibold select-none leading-relaxed">
+          <Sparkles className="w-5 h-5 text-indigo-400 animate-spin flex-shrink-0" />
+          <span>
+            {rates.discountHeading} <strong className="text-amber-400 text-sm">({rates.discountPercentage}% flat discount applied!)</strong>
+          </span>
+        </div>
+      )}
 
       {/* Grid Left: Quick Service Cards */}
       <div className="lg:col-span-6 space-y-4">
@@ -95,7 +161,7 @@ Please let me know your availability to discuss further!`;
           <div onClick={() => setService("android")} className={`p-4 rounded-xl border transition-all cursor-pointer text-left ${service === "android" ? "bg-slate-900 border-indigo-500" : "bg-slate-900/30 border-slate-800 hover:border-slate-700/80"}`}>
             <div className="flex items-center justify-between mb-1.5">
               <span className="font-sans font-extrabold text-xs tracking-wider uppercase text-indigo-400">02. Mobile App Specialist</span>
-              <span className="text-[10px] font-mono text-slate-450 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">Kotlin / React Native</span>
+              <span className="text-[10px] font-mono text-slate-455 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">Kotlin / React Native</span>
             </div>
             <h4 className="font-sans font-bold text-sm text-white mb-1">Android IoT Telemetry APKs</h4>
             <p className="text-xs text-slate-400 leading-normal font-sans">
@@ -106,7 +172,7 @@ Please let me know your availability to discuss further!`;
           <div onClick={() => setService("backend")} className={`p-4 rounded-xl border transition-all cursor-pointer text-left ${service === "backend" ? "bg-slate-900 border-indigo-500" : "bg-slate-900/30 border-slate-800 hover:border-slate-700/80"}`}>
             <div className="flex items-center justify-between mb-1.5">
               <span className="font-sans font-extrabold text-xs tracking-wider uppercase text-indigo-400">03. Database Specialist</span>
-              <span className="text-[10px] font-mono text-slate-450 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">Serverless & Rules Auditing</span>
+              <span className="text-[10px] font-mono text-slate-455 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">Serverless & Rules Auditing</span>
             </div>
             <h4 className="font-sans font-bold text-sm text-white mb-1">Secure Systems Architecture</h4>
             <p className="text-xs text-slate-400 leading-normal font-sans">
@@ -143,7 +209,7 @@ Please let me know your availability to discuss further!`;
                       setPagesCount(st === "backend" ? 2 : 3);
                     }}
                     className={`text-[10px] font-mono font-bold uppercase py-2 rounded-md tracking-wider transition-all cursor-pointer ${
-                      service === st ? "bg-indigo-650 text-white shadow" : "text-slate-450 hover:text-slate-200"
+                      service === st ? "bg-indigo-600 text-white shadow" : "text-slate-400 hover:text-slate-250"
                     }`}
                   >
                     {st === "web" ? "Web UI" : st === "android" ? "Android" : "Cloud DB"}
@@ -158,7 +224,7 @@ Please let me know your availability to discuss further!`;
                 <span className="text-slate-400">
                   {service === "android" ? "Feature Modules / Views:" : service === "backend" ? "Database Collections:" : "Quantity of Layout Pages:"}
                 </span>
-                <span className="text-white font-extrabold bg-slate-905 px-2 py-0.5 border border-slate-800 rounded">{pagesCount}</span>
+                <span className="text-white font-extrabold bg-slate-900 px-2 py-0.5 border border-slate-800 rounded">{pagesCount}</span>
               </div>
               <input 
                 type="range" 
@@ -177,7 +243,7 @@ Please let me know your availability to discuss further!`;
 
             {/* Add-on toggles list */}
             <div className="space-y-2 pt-2 border-t border-slate-800/60">
-              <label className="text-xs font-mono text-slate-450 block">Optional Technical Milestones Adds:</label>
+              <label className="text-xs font-mono text-slate-400 block">Optional Technical Milestones Adds:</label>
               <div className="space-y-2">
                 
                 <button 
@@ -188,29 +254,29 @@ Please let me know your availability to discuss further!`;
                     <input type="checkbox" checked={dbAddon} readOnly className="accent-indigo-500" />
                     <span className="font-sans text-slate-300">Firestore Real-time DB & Auth Integration</span>
                   </div>
-                  <span className="font-mono font-bold text-indigo-400">+৳5,000</span>
+                  <span className="font-mono font-bold text-indigo-400">+৳{rates.dbAddon.toLocaleString()}</span>
                 </button>
 
                 <button 
                   onClick={() => setAdminAddon(!adminAddon)}
-                  className="w-full flex items-center justify-between p-2.5 rounded-lg text-left bg-slate-950 border border-slate-800/80 hover:border-slate-800 transition-all text-xs"
+                  className="w-full flex items-center justify-between p-2.5 rounded-lg text-left bg-slate-950 border border-slate-800/80 hover:border-slate-850 transition-all text-xs"
                 >
                   <div className="flex items-center gap-2">
                     <input type="checkbox" checked={adminAddon} readOnly className="accent-indigo-500" />
                     <span className="font-sans text-slate-300">Custom Admin Panel Dashboard View</span>
                   </div>
-                  <span className="font-mono font-bold text-indigo-400">+৳7,500</span>
+                  <span className="font-mono font-bold text-indigo-400">+৳{rates.adminAddon.toLocaleString()}</span>
                 </button>
 
                 <button 
                   onClick={() => setSecurityAddon(!securityAddon)}
-                  className="w-full flex items-center justify-between p-2.5 rounded-lg text-left bg-slate-950 border border-slate-800/80 hover:border-slate-800 transition-all text-xs"
+                  className="w-full flex items-center justify-between p-2.5 rounded-lg text-left bg-slate-950 border border-slate-800/80 hover:border-slate-850 transition-all text-xs"
                 >
                   <div className="flex items-center gap-2">
                     <input type="checkbox" checked={securityAddon} readOnly className="accent-indigo-500" />
                     <span className="font-sans text-slate-300">Zero-Trust Rules Security Auditing</span>
                   </div>
-                  <span className="font-mono font-bold text-indigo-400">+৳4,000</span>
+                  <span className="font-mono font-bold text-indigo-400">+৳{rates.securityAddon.toLocaleString()}</span>
                 </button>
 
               </div>
@@ -220,11 +286,19 @@ Please let me know your availability to discuss further!`;
         </div>
 
         {/* Dynamic quote output header */}
-        <div className="bg-slate-950 border border-slate-850 p-4 rounded-xl flex items-center justify-between gap-4">
+        <div className="bg-slate-950 border border-slate-800 p-4 rounded-xl flex items-center justify-between gap-4">
           <div className="space-y-0.5">
             <span className="text-[10px] font-mono uppercase text-slate-500">Formulated Investment:</span>
-            <div className="font-sans font-black text-xl sm:text-2xl text-emerald-450 tracking-tight">
-              ৳{costText.toLocaleString()} <span className="text-xs font-mono font-medium text-slate-400">BDT</span>
+            
+            <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
+              {rates.discountActive && (
+                <span className="text-xs font-mono text-slate-500 line-through">
+                  ৳{unDiscountedCost.toLocaleString()}
+                </span>
+              )}
+              <div className="font-sans font-black text-xl sm:text-2xl text-emerald-400 tracking-tight">
+                ৳{costText.toLocaleString()} <span className="text-xs font-mono font-medium text-slate-400">BDT</span>
+              </div>
             </div>
           </div>
           <button

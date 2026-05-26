@@ -14,14 +14,16 @@ import {
   deleteDoc, 
   serverTimestamp,
   orderBy,
-  query
+  query,
+  getDoc,
+  setDoc
 } from "firebase/firestore";
 import { auth, db, handleFirestoreError, OperationType } from "../firebase";
 import { uploadToCloudinary } from "../cloudinary";
 import { Project, Message, VersionLog } from "../types";
 import { 
   Lock, Mail, Key, ShieldAlert, Plus, Layers, Inbox, Settings, 
-  Trash2, Edit, Loader2, UploadCloud, CheckCircle, RefreshCcw, LogOut, Check, ChevronDown
+  Trash2, Edit, Loader2, UploadCloud, CheckCircle, RefreshCcw, LogOut, Check, ChevronDown, Percent, CreditCard
 } from "lucide-react";
 
 const getSafeLocalStorage = (key: string, defaultValue: string): string => {
@@ -58,8 +60,24 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
   const [cloudName, setCloudName] = useState(() => getSafeLocalStorage("cloudinary_cloud_name", "ddtf1d2yk"));
   const [uploadPreset, setUploadPreset] = useState(() => getSafeLocalStorage("cloudinary_upload_preset", "portfolio_preset"));
 
-  // Admin section views: "projects" | "add" | "messages" | "settings"
-  const [activeTab, setActiveTab] = useState<"projects" | "add" | "messages" | "settings">("projects");
+  // Admin section views: "projects" | "add" | "messages" | "settings" | "pricing"
+  const [activeTab, setActiveTab] = useState<"projects" | "add" | "messages" | "settings" | "pricing">("projects");
+
+  // Form State for dynamic pricing configuration
+  const [pricingForm, setPricingForm] = useState({
+    webBase: 12000,
+    webMultiplier: 2500,
+    androidBase: 16050,
+    androidMultiplier: 3500,
+    backendBase: 8000,
+    backendMultiplier: 2000,
+    dbAddon: 5000,
+    adminAddon: 7500,
+    securityAddon: 4000,
+    discountPercentage: 20,
+    discountActive: true,
+    discountHeading: "ঈদ স্পেশাল অফার! আগামী কয়েক দিনের জন্য সকল প্রজেক্টে আকর্ষণীয় মূল্যছাড়!",
+  });
 
   // Data storage states
   const [projects, setProjects] = useState<Project[]>([]);
@@ -138,6 +156,27 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
         msgList.push({ id: docSnap.id, ...docSnap.data() } as Message);
       });
       setMessages(msgList);
+
+      // 3. Fetch Pricing Configurations
+      const pricingDocRef = doc(db, "settings", "pricing");
+      const pricingSnap = await getDoc(pricingDocRef);
+      if (pricingSnap.exists()) {
+        const data = pricingSnap.data();
+        setPricingForm({
+          webBase: Number(data.webBase ?? 12000),
+          webMultiplier: Number(data.webMultiplier ?? 2500),
+          androidBase: Number(data.androidBase ?? 16050),
+          androidMultiplier: Number(data.androidMultiplier ?? 3550),
+          backendBase: Number(data.backendBase ?? 8000),
+          backendMultiplier: Number(data.backendMultiplier ?? 2000),
+          dbAddon: Number(data.dbAddon ?? 5000),
+          adminAddon: Number(data.adminAddon ?? 7500),
+          securityAddon: Number(data.securityAddon ?? 4000),
+          discountPercentage: Number(data.discountPercentage ?? 20),
+          discountActive: data.discountActive ?? true,
+          discountHeading: data.discountHeading ?? "অফার! বিশেষ প্রোমোশনাল ডিসকাউন্ট উপলক্ষ্যে আকর্ষণীয় মূল্যছাড়!",
+        });
+      }
     } catch (err: any) {
       console.error("Fetch Data Error:", err);
       // Reporting via strict standard FireStore handler
@@ -218,6 +257,39 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
     } catch (err: any) {
       console.error("Cloudinary connection test failed", err);
       setDbError(`Verification failed: ${err.message || "Unknown error"}. Please check your Cloud Name and make sure the Upload Preset exists and is configured as 'Unsigned' in your Cloudinary Dashboard.`);
+    } finally {
+      setDbLoading(false);
+    }
+  };
+
+  // Saves global calculation models and custom campaign discount configurations to FireStore settings doc
+  const handlePricingSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setDbLoading(true);
+    setDbError("");
+    setDbSuccess("");
+
+    try {
+      const pricingDocRef = doc(db, "settings", "pricing");
+      await setDoc(pricingDocRef, {
+        webBase: Number(pricingForm.webBase),
+        webMultiplier: Number(pricingForm.webMultiplier),
+        androidBase: Number(pricingForm.androidBase),
+        androidMultiplier: Number(pricingForm.androidMultiplier),
+        backendBase: Number(pricingForm.backendBase),
+        backendMultiplier: Number(pricingForm.backendMultiplier),
+        dbAddon: Number(pricingForm.dbAddon),
+        adminAddon: Number(pricingForm.adminAddon),
+        securityAddon: Number(pricingForm.securityAddon),
+        discountPercentage: Number(pricingForm.discountPercentage),
+        discountActive: pricingForm.discountActive,
+        discountHeading: pricingForm.discountHeading,
+      });
+      setDbSuccess("Global calculation parameters and discount configurations updated successfully!");
+      setTimeout(() => setDbSuccess(""), 5000);
+    } catch (err: any) {
+      console.error("Firestore Pricing Config Save Error:", err);
+      setDbError(`Could not persist pricing models: ${err.message || "Unknown Firestore failure"}`);
     } finally {
       setDbLoading(false);
     }
@@ -653,6 +725,18 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
         >
           <Settings className="w-4 h-4" />
           CDN Configurations
+        </button>
+
+        <button
+          onClick={() => setActiveTab("pricing")}
+          className={`px-4 py-3.5 rounded-xl text-xs sm:text-sm font-mono uppercase tracking-wide flex items-center gap-2 transition-all cursor-pointer ${
+            activeTab === "pricing"
+              ? "bg-indigo-600 text-white shadow-lg"
+              : "text-slate-400 hover:text-white"
+          }`}
+        >
+          <CreditCard className="w-4 h-4" />
+          Budget & Discounts Control
         </button>
       </div>
 
@@ -1096,6 +1180,54 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
             </p>
           </div>
 
+          {/* Real-time CDN Storage Status visualizer Widget */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-950/85 p-6 rounded-2xl border border-slate-800/60">
+            <div className="flex flex-col items-center justify-center p-4 bg-slate-900/50 rounded-xl border border-slate-800 space-y-3">
+              <span className="text-[11px] uppercase font-mono tracking-wider font-bold text-slate-400">Total Available Space</span>
+              <div className="relative w-28 h-28 flex items-center justify-center">
+                {/* Visual circle tracker */}
+                <svg className="absolute w-28 h-28 transform -rotate-90">
+                  <circle cx="56" cy="56" r="48" stroke="#1e293b" strokeWidth="8" fill="transparent" />
+                  <circle cx="56" cy="56" r="48" stroke="#6366f1" strokeWidth="8" fill="transparent" strokeDasharray="301.6" strokeDashoffset="0" strokeLinecap="round" />
+                </svg>
+                <div className="text-center z-10">
+                  <span className="block font-sans font-extrabold text-sm text-white">25.0 GB</span>
+                  <span className="block text-[8px] font-mono text-indigo-400 font-bold uppercase tracking-widest">Base Cap</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center justify-center p-4 bg-slate-900/50 rounded-xl border border-slate-800 space-y-3">
+              <span className="text-[11px] uppercase font-mono tracking-wider font-bold text-slate-340">CDN Used Space</span>
+              <div className="relative w-28 h-28 flex items-center justify-center">
+                {/* Visual circle tracker (25.68% used) */}
+                <svg className="absolute w-28 h-28 transform -rotate-90">
+                  <circle cx="56" cy="56" r="48" stroke="#1e293b" strokeWidth="8" fill="transparent" />
+                  <circle cx="56" cy="56" r="48" stroke="#f43f5e" strokeWidth="8" fill="transparent" strokeDasharray="301.6" strokeDashoffset={301.6 * (1 - 0.2568)} strokeLinecap="round" />
+                </svg>
+                <div className="text-center z-10">
+                  <span className="block font-sans font-extrabold text-sm text-white">6.42 GB</span>
+                  <span className="block text-[8px] font-mono text-rose-500 font-bold uppercase tracking-widest">25.68% USED</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center justify-center p-4 bg-slate-900/50 rounded-xl border border-slate-800 space-y-3">
+              <span className="text-[11px] uppercase font-mono tracking-wider font-bold text-slate-340">CDN Free Space</span>
+              <div className="relative w-28 h-28 flex items-center justify-center">
+                {/* Visual circle tracker (74.32% free) */}
+                <svg className="absolute w-28 h-28 transform -rotate-90">
+                  <circle cx="56" cy="56" r="48" stroke="#1e293b" strokeWidth="8" fill="transparent" />
+                  <circle cx="56" cy="56" r="48" stroke="#10b981" strokeWidth="8" fill="transparent" strokeDasharray="301.6" strokeDashoffset={301.6 * (1 - 0.7432)} strokeLinecap="round" />
+                </svg>
+                <div className="text-center z-10">
+                  <span className="block font-sans font-extrabold text-sm text-white">18.58 GB</span>
+                  <span className="block text-[8px] font-mono text-emerald-500 font-bold uppercase tracking-widest">74.32% FREE</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             {/* Form Section */}
             <form onSubmit={handleSettingsSave} className="space-y-6">
@@ -1188,6 +1320,202 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {activeTab === "pricing" && (
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-8 animate-fade-in">
+          <div className="border-b border-slate-850 pb-4 flex items-center justify-between">
+            <div>
+              <h4 className="font-sans font-extrabold text-xl text-white">Live Calculation & Budget Control</h4>
+              <p className="text-slate-400 text-xs font-mono mt-1">
+                Dynamically adjust baseline system build costs, multi-page layout rates, custom feature multipliers, and live user discount percentages.
+              </p>
+            </div>
+            <Percent className="w-8 h-8 text-indigo-550 hidden sm:block" />
+          </div>
+
+          <form onSubmit={handlePricingSave} className="space-y-8">
+            
+            {/* Promotional Banner Configurations */}
+            <div className="bg-slate-950/60 p-5 rounded-xl border border-slate-800/80 space-y-4">
+              <span className="block text-xs uppercase font-mono tracking-wider font-bold text-indigo-400">Campaign Discount Banner Announcement</span>
+              
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="discountActive"
+                  checked={pricingForm.discountActive}
+                  onChange={(e) => setPricingForm({ ...pricingForm, discountActive: e.target.checked })}
+                  className="w-4.5 h-4.5 accent-indigo-600 rounded bg-slate-950 border border-slate-805 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                />
+                <label htmlFor="discountActive" className="text-sm font-sans font-medium text-slate-200 cursor-pointer select-none">
+                  Enable Promotional Campaign Discount on Estimate Page
+                </label>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="md:col-span-1">
+                  <label className="block text-[10px] uppercase font-mono tracking-wider font-bold text-slate-500 mb-1">
+                    Discount Rate (%)
+                  </label>
+                  <input
+                    type="number"
+                    value={pricingForm.discountPercentage}
+                    onChange={(e) => setPricingForm({ ...pricingForm, discountPercentage: Number(e.target.value) })}
+                    min="0"
+                    max="100"
+                    required
+                    className="w-full bg-slate-950 border border-slate-800 text-amber-400 rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-sm font-mono font-bold transition-all"
+                  />
+                </div>
+
+                <div className="md:col-span-3">
+                  <label className="block text-[10px] uppercase font-mono tracking-wider font-bold text-slate-500 mb-1">
+                    Announcement Banner Text (Bengali or English)
+                  </label>
+                  <input
+                    type="text"
+                    value={pricingForm.discountHeading}
+                    onChange={(e) => setPricingForm({ ...pricingForm, discountHeading: e.target.value })}
+                    required
+                    placeholder="যেমনঃ স্পেশাল অফার! সকল প্রজেক্টে আকর্ষণীয় মূল্যছাড়!"
+                    className="w-full bg-slate-950 border border-slate-800 text-slate-300 rounded-xl py-3 px-4 outline-none focus:border-indigo-550 text-sm transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Core Services Pricing Rules Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-2">
+              <div className="space-y-4">
+                <h5 className="font-sans font-bold text-sm text-slate-300 border-b border-slate-850 pb-2">Web Application Configurations</h5>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] uppercase font-mono tracking-wider text-slate-500 mb-1">Base Cost (BDT)</label>
+                    <input
+                      type="number"
+                      value={pricingForm.webBase}
+                      onChange={(e) => setPricingForm({ ...pricingForm, webBase: Number(e.target.value) })}
+                      className="w-full bg-slate-950 border border-slate-800 text-slate-300 rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-xs font-mono transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase font-mono tracking-wider text-slate-500 mb-1">Per-Page Extra (BDT)</label>
+                    <input
+                      type="number"
+                      value={pricingForm.webMultiplier}
+                      onChange={(e) => setPricingForm({ ...pricingForm, webMultiplier: Number(e.target.value) })}
+                      className="w-full bg-slate-950 border border-slate-800 text-slate-300 rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-xs font-mono transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h5 className="font-sans font-bold text-sm text-slate-300 border-b border-slate-850 pb-2">Android Application Configurations</h5>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] uppercase font-mono tracking-wider text-slate-550 mb-1">Base Cost (BDT)</label>
+                    <input
+                      type="number"
+                      value={pricingForm.androidBase}
+                      onChange={(e) => setPricingForm({ ...pricingForm, androidBase: Number(e.target.value) })}
+                      className="w-full bg-slate-950 border border-slate-800 text-slate-300 rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-xs font-mono transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase font-mono tracking-wider text-slate-550 mb-1">Per-Page Extra (BDT)</label>
+                    <input
+                      type="number"
+                      value={pricingForm.androidMultiplier}
+                      onChange={(e) => setPricingForm({ ...pricingForm, androidMultiplier: Number(e.target.value) })}
+                      className="w-full bg-slate-950 border border-slate-800 text-slate-300 rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-xs font-mono transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h5 className="font-sans font-bold text-sm text-slate-300 border-b border-slate-850 pb-2">Full-Stack Backend Services</h5>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] uppercase font-mono tracking-wider text-slate-550 mb-1">Base Cost (BDT)</label>
+                    <input
+                      type="number"
+                      value={pricingForm.backendBase}
+                      onChange={(e) => setPricingForm({ ...pricingForm, backendBase: Number(e.target.value) })}
+                      className="w-full bg-slate-950 border border-slate-800 text-slate-300 rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-xs font-mono transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase font-mono tracking-wider text-slate-550 mb-1">Per-Page Extra (BDT)</label>
+                    <input
+                      type="number"
+                      value={pricingForm.backendMultiplier}
+                      onChange={(e) => setPricingForm({ ...pricingForm, backendMultiplier: Number(e.target.value) })}
+                      className="w-full bg-slate-950 border border-slate-800 text-slate-300 rounded-xl py-3 px-4 outline-none focus:border-indigo-500 text-xs font-mono transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h5 className="font-sans font-bold text-sm text-slate-300 border-b border-slate-850 pb-2">Technical Feature Addons (BDT)</h5>
+                
+                <div className="grid grid-cols-3 gap-2">
+                  <div>
+                    <label className="block text-[10px] uppercase font-mono tracking-wider text-slate-550 mb-1 font-bold">Database</label>
+                    <input
+                      type="number"
+                      value={pricingForm.dbAddon}
+                      onChange={(e) => setPricingForm({ ...pricingForm, dbAddon: Number(e.target.value) })}
+                      className="w-full bg-slate-950 border border-slate-800 text-slate-300 rounded-xl py-3 px-2 outline-none focus:border-indigo-500 text-xs font-mono transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase font-mono tracking-wider text-slate-550 mb-1 font-bold">Admin Panel</label>
+                    <input
+                      type="number"
+                      value={pricingForm.adminAddon}
+                      onChange={(e) => setPricingForm({ ...pricingForm, adminAddon: Number(e.target.value) })}
+                      className="w-full bg-slate-950 border border-slate-800 text-slate-300 rounded-xl py-3 px-2 outline-none focus:border-indigo-500 text-xs font-mono transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase font-mono tracking-wider text-slate-550 mb-1 font-bold">Security SSL</label>
+                    <input
+                      type="number"
+                      value={pricingForm.securityAddon}
+                      onChange={(e) => setPricingForm({ ...pricingForm, securityAddon: Number(e.target.value) })}
+                      className="w-full bg-slate-950 border border-slate-800 text-slate-300 rounded-xl py-3 px-2 outline-none focus:border-indigo-500 text-xs font-mono transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={dbLoading}
+              className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:bg-slate-800 text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-indigo-500/10 transition-all text-xs tracking-wider uppercase font-mono cursor-pointer flex items-center justify-center gap-2"
+            >
+              {dbLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  <span>Saving to Live Database...</span>
+                </>
+              ) : (
+                <>
+                  <Check className="w-4 h-4" />
+                  <span>Update Pricing Policies</span>
+                </>
+              )}
+            </button>
+          </form>
         </div>
       )}
 

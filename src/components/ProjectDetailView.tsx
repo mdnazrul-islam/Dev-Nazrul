@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Project } from "../types";
-import { ArrowLeft, Globe, Smartphone, Play, LogIn, ChevronDown, ChevronUp, Download, Eye, QrCode } from "lucide-react";
+import { ArrowLeft, Globe, Smartphone, Play, LogIn, ChevronDown, ChevronUp, Download, Eye, QrCode, Share2, Check } from "lucide-react";
 
 interface ProjectDetailViewProps {
   project: Project;
@@ -9,8 +9,43 @@ interface ProjectDetailViewProps {
 
 export default function ProjectDetailView({ project, onBack }: ProjectDetailViewProps) {
   const [activeAccordion, setActiveAccordion] = useState<"guide" | "changelog" | null>("guide");
+  const [copiedShare, setCopiedShare] = useState(false);
 
   const isApp = project.category === "App";
+
+  const slugify = (text: string) => {
+    return text
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  };
+
+  const handleShare = () => {
+    const slug = slugify(project.title);
+    const origin = window.location.origin;
+    const shareUrl = `${origin}/${slug}`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: project.title,
+        text: project.description,
+        url: shareUrl,
+      })
+      .then(() => console.log('Successful share'))
+      .catch((error) => console.log('Error sharing', error));
+    }
+    
+    // Always fall back to copy to clipboard for robust UX
+    navigator.clipboard.writeText(shareUrl)
+      .then(() => {
+        setCopiedShare(true);
+        setTimeout(() => setCopiedShare(false), 2005);
+      })
+      .catch(err => {
+        console.warn("Clipboard copying failed", err);
+      });
+  };
 
   // Helper to extract Embeddable YouTube or Vimeo URLs from regular watch links for iframe support
   const getEmbedVideoUrl = (url?: string): string | null => {
@@ -77,16 +112,35 @@ export default function ProjectDetailView({ project, onBack }: ProjectDetailView
             </p>
           </div>
 
-          <span
-            className={`inline-flex items-center gap-1.5 self-start sm:self-center px-4 py-1.5 rounded-full text-xs font-bold font-mono uppercase tracking-widest ${
-              isApp
-                ? "bg-amber-500 text-slate-950"
-                : "bg-indigo-600 text-white border border-indigo-500/20"
-            }`}
-          >
-            {isApp ? <Smartphone className="w-4 h-4" /> : <Globe className="w-4 h-4" />}
-            {project.category} Showcase
-          </span>
+          <div className="flex flex-wrap items-center gap-2 self-start sm:self-center">
+            <span
+              className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold font-mono uppercase tracking-widest ${
+                isApp
+                  ? "bg-amber-500 text-slate-950"
+                  : "bg-indigo-600 text-white border border-indigo-500/20"
+              }`}
+            >
+              {isApp ? <Smartphone className="w-4 h-4" /> : <Globe className="w-4 h-4" />}
+              {project.category} Showcase
+            </span>
+
+            <button
+               onClick={handleShare}
+               className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold font-mono uppercase tracking-widest bg-slate-900 border border-slate-800 text-indigo-400 hover:text-indigo-300 hover:border-slate-700 hover:bg-slate-800 transition-all cursor-pointer"
+            >
+              {copiedShare ? (
+                <>
+                  <Check className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+                  <span>Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span>Share</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Media Layout & Core Settings */}
@@ -209,7 +263,7 @@ export default function ProjectDetailView({ project, onBack }: ProjectDetailView
                 <span className="text-[10px] uppercase font-mono tracking-wider text-slate-500 block mb-2 font-bold select-none">
                   Core Technologies used
                 </span>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-1.5 mb-4">
                   {project.techStack?.map((tech, idx) => (
                     <span
                       key={idx}
@@ -218,6 +272,49 @@ export default function ProjectDetailView({ project, onBack }: ProjectDetailView
                       {tech}
                     </span>
                   ))}
+                </div>
+              </div>
+
+              {/* Specialized Sharing Distribution segment */}
+              <div className="pt-4 border-t border-slate-800 space-y-2">
+                <span className="text-[10px] uppercase font-mono tracking-wider text-slate-500 block font-bold select-none">
+                  Share & Promote Project
+                </span>
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => {
+                      const slug = slugify(project.title);
+                      const url = `${window.location.origin}/${slug}`;
+                      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, "_blank");
+                    }}
+                    className="flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-mono font-bold bg-[#1877F2]/10 hover:bg-[#1877F2]/20 border border-[#1877F2]/25 text-[#1877F2] rounded-xl transition-all cursor-pointer"
+                  >
+                    <span>Facebook</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      const slug = slugify(project.title);
+                      const url = `${window.location.origin}/${slug}`;
+                      const text = `Check out this amazing project: ${project.title}`;
+                      window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, "_blank");
+                    }}
+                    className="flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-mono font-bold bg-[#1DA1F2]/10 hover:bg-[#1DA1F2]/20 border border-[#1DA1F2]/25 text-[#1DA1F2] rounded-xl transition-all cursor-pointer"
+                  >
+                    <span>Twitter (X)</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      const slug = slugify(project.title);
+                      const url = `${window.location.origin}/${slug}`;
+                      window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, "_blank");
+                    }}
+                    className="col-span-2 flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-mono font-bold bg-[#0A66C2]/10 hover:bg-[#0A66C2]/20 border border-[#0A66C2]/25 text-[#0A66C2] rounded-xl transition-all cursor-pointer"
+                  >
+                    <span>LinkedIn Network</span>
+                  </button>
                 </div>
               </div>
             </div>

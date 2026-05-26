@@ -86,6 +86,15 @@ export default function App() {
     }
   };
 
+  // Slugify helper supporting custom routing
+  const slugify = (text: string) => {
+    return text
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  };
+
   // Listen to browser URL path changes (and hash triggers) to load requested views dynamically
   useEffect(() => {
     const handleUrlRouting = () => {
@@ -93,6 +102,10 @@ export default function App() {
       const hash = window.location.hash;
       const urlParams = new URLSearchParams(window.location.search);
       const queryView = urlParams.get("view");
+      
+      let cleanPath = pathname;
+      if (cleanPath.startsWith("/")) cleanPath = cleanPath.slice(1);
+      if (cleanPath.endsWith("/")) cleanPath = cleanPath.slice(0, -1);
       
       if (
         pathname === "/admin" || 
@@ -102,6 +115,7 @@ export default function App() {
         queryView === "admin"
       ) {
         setView("admin");
+        setActiveProject(null);
       } else if (
         pathname === "/gallery" || 
         pathname === "/gallery/" || 
@@ -110,6 +124,7 @@ export default function App() {
         queryView === "gallery"
       ) {
         setView("gallery");
+        setActiveProject(null);
       } else if (
         pathname === "/contact" || 
         pathname === "/contact/" || 
@@ -118,8 +133,12 @@ export default function App() {
         queryView === "contact"
       ) {
         setView("contact");
+        setActiveProject(null);
+      } else if (cleanPath !== "" && cleanPath !== "home") {
+        // Lookups will be executed once the projects are sync loaded
       } else {
         setView("home");
+        setActiveProject(null);
       }
     };
 
@@ -160,6 +179,44 @@ export default function App() {
   // Combined source: combines standard Firestore rows with templates for a full catalog
   const allProjects = databaseProjects.length > 0 ? databaseProjects : baselineTemplateProjects;
 
+  // Listen to load completion of projects to trigger custom layout matches
+  useEffect(() => {
+    if (allProjects.length > 0) {
+      const pathname = window.location.pathname;
+      let cleanPath = pathname;
+      if (cleanPath.startsWith("/")) cleanPath = cleanPath.slice(1);
+      if (cleanPath.endsWith("/")) cleanPath = cleanPath.slice(0, -1);
+
+      if (
+        cleanPath !== "" && 
+        cleanPath !== "admin" && 
+        cleanPath !== "gallery" && 
+        cleanPath !== "contact" && 
+        cleanPath !== "home"
+      ) {
+        const matched = allProjects.find(
+          (p) => slugify(p.title) === cleanPath || p.id === cleanPath || (p.id && slugify(p.id) === cleanPath)
+        );
+        if (matched) {
+          setActiveProject(matched);
+        }
+      }
+    }
+  }, [allProjects]);
+
+  const handleSelectProject = (project: Project) => {
+    setActiveProject(project);
+    const slug = slugify(project.title);
+    try {
+      if (window.location.pathname !== `/${slug}`) {
+        window.history.pushState({ view: "project", id: project.id }, "", `/${slug}`);
+      }
+    } catch (e) {
+      console.warn("pushState blocked by security restrictions:", e);
+      window.location.hash = `#/${slug}`;
+    }
+  };
+
   // Selected Filter settings
   const [galleryFilter, setGalleryFilter] = useState<"All" | "Web" | "App">("All");
 
@@ -172,7 +229,6 @@ export default function App() {
     navigateToRoute("gallery");
     setGalleryFilter("All");
     setActiveProject(null);
-    window.scrollTo({ top: 300, behavior: "smooth" });
   };
 
   const handleContactTrigger = () => {
@@ -203,7 +259,10 @@ export default function App() {
         {activeProject ? (
           <ProjectDetailView 
             project={activeProject} 
-            onBack={() => setActiveProject(null)} 
+            onBack={() => {
+              setActiveProject(null);
+              navigateToRoute(currentView);
+            }} 
           />
         ) : (
           <>
@@ -236,7 +295,7 @@ export default function App() {
                         <ProjectCard 
                           key={project.id || project.title} 
                           project={project} 
-                          onSelection={(p) => setActiveProject(p)} 
+                          onSelection={handleSelectProject} 
                         />
                       ))}
                     </div>
@@ -342,7 +401,7 @@ export default function App() {
                       <ProjectCard 
                         key={project.id || project.title} 
                         project={project} 
-                        onSelection={(p) => setActiveProject(p)} 
+                        onSelection={handleSelectProject} 
                       />
                     ))}
                   </div>
