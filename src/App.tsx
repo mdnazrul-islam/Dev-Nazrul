@@ -465,7 +465,7 @@ export default function App() {
             {currentView === "gallery" && (
               <div id="gallery-view" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 animate-fade-in">
                 <div className="text-center space-y-2">
-                  <h2 className="font-sans font-extrabold text-3xl sm:text-4xl text-white tracking-tight">Project Hub</h2>
+                  <h2 className="font-sans font-extrabold text-3xl sm:text-4xl text-slate-100 tracking-tight">Project Hub</h2>
                   <p className="text-sm text-slate-400 max-w-xl mx-auto">
                     Browse and inspect live running links or download secure APK bundles directly. Use toggles below to narrow down your search.
                   </p>
@@ -520,7 +520,7 @@ export default function App() {
             {currentView === "budget" && (
               <div id="budget-view" className="max-w-3xl mx-auto px-4 sm:px-6 py-16 animate-fade-in space-y-8">
                 <div className="text-center space-y-2">
-                  <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-white tracking-tight">Interactive Budget Planner</h2>
+                  <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-slate-100 tracking-tight">Interactive Budget Planner</h2>
                   <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto font-sans leading-relaxed">
                     Get an instant cost assessment mapping to your system specifications. All rates are configured in real-time.
                   </p>

@@ -59,9 +59,9 @@ export default function ContactForm() {
   };
 
   return (
-    <div id="contact-form-component" className="bg-slate-900 rounded-2xl border border-slate-800 shadow-2xl p-6 sm:p-8 max-w-xl mx-auto text-white">
+    <div id="contact-form-component" className="bg-slate-900 rounded-2xl border border-slate-800 shadow-2xl p-6 sm:p-8 max-w-xl mx-auto text-slate-100">
       <div className="text-center mb-6">
-        <h3 className="font-sans font-bold text-xl sm:text-2xl tracking-tight text-white">Send a Message</h3>
+        <h3 className="font-sans font-bold text-xl sm:text-2xl tracking-tight text-slate-100">Send a Message</h3>
         <p className="text-xs sm:text-sm text-slate-400 font-sans mt-1">
           Have an idea or project? Let's talk and build it together!
         </p>
@@ -99,7 +99,7 @@ export default function ContactForm() {
             placeholder="John Doe"
             required
             disabled={loading}
-            className="w-full bg-slate-950/70 border border-slate-800 text-white rounded-xl py-3 px-4 outline-none focus:border-indigo-500/75 focus:ring-2 focus:ring-indigo-500/10 transition-all text-sm disabled:opacity-50"
+            className="w-full bg-slate-950/70 border border-slate-800 text-slate-100 rounded-xl py-3 px-4 outline-none focus:border-indigo-500/75 focus:ring-2 focus:ring-indigo-500/10 transition-all text-sm disabled:opacity-50"
           />
         </div>
 
@@ -117,7 +117,7 @@ export default function ContactForm() {
             placeholder="john@example.com"
             required
             disabled={loading}
-            className="w-full bg-slate-950/70 border border-slate-800 text-white rounded-xl py-3 px-4 outline-none focus:border-indigo-500/75 focus:ring-2 focus:ring-indigo-500/10 transition-all text-sm disabled:opacity-50"
+            className="w-full bg-slate-950/70 border border-slate-800 text-slate-100 rounded-xl py-3 px-4 outline-none focus:border-indigo-500/75 focus:ring-2 focus:ring-indigo-500/10 transition-all text-sm disabled:opacity-50"
           />
         </div>
 
@@ -135,7 +135,7 @@ export default function ContactForm() {
             placeholder="What is your product idea, target budget, or general inquiry?..."
             required
             disabled={loading}
-            className="w-full bg-slate-950/70 border border-slate-800 text-white rounded-xl py-3 px-4 outline-none focus:border-indigo-500/75 focus:ring-2 focus:ring-indigo-500/10 transition-all text-sm resize-none disabled:opacity-50"
+            className="w-full bg-slate-950/70 border border-slate-800 text-slate-100 rounded-xl py-3 px-4 outline-none focus:border-indigo-500/75 focus:ring-2 focus:ring-indigo-500/10 transition-all text-sm resize-none disabled:opacity-50"
           />
         </div>
 

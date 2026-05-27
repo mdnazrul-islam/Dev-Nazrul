@@ -657,12 +657,12 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
   // Standard visual login UI wrapper if not logged in
   if (!user || !user.email) {
     return (
-      <div id="admin-login-view" className="max-w-md mx-auto my-12 bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 text-white shadow-2xl">
+      <div id="admin-login-view" className="max-w-md mx-auto my-12 bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 text-slate-100 shadow-2xl">
         <div id="admin-login-header" className="text-center space-y-2 mb-6">
           <div className="w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center text-white mx-auto shadow-md">
             <Lock className="w-6 h-6" />
           </div>
-          <h2 className="font-sans font-extrabold text-2xl tracking-tight text-white">Admin Console</h2>
+          <h2 className="font-sans font-extrabold text-2xl tracking-tight text-slate-100">Admin Console</h2>
           <p className="text-slate-450 text-xs sm:text-sm font-mono tracking-wide">
             PORTFOLIO SECURED ROUTE
           </p>
@@ -674,10 +674,10 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
             <ShieldAlert className="w-4 h-4 text-indigo-400" />
             ADMIN PRIVILEGE ACCESS
           </div>
-          <p className="text-slate-400 leading-normal">
+          <p className="text-slate-440 leading-normal">
             Please enter authorized administrator credentials. Only accounts manually registered in the Firebase project console will be granted access.
           </p>
-        </div>
+         </div>
 
         {authError && (
           <div className="v-error border border-rose-500/30 bg-rose-500/10 text-rose-400 rounded-xl p-3.5 mb-4 text-xs leading-normal font-mono">
@@ -693,7 +693,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
 
         <form onSubmit={handleAuthSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs uppercase font-mono font-bold text-slate-450 tracking-wider mb-1">
+            <label className="block text-xs uppercase font-mono font-bold text-slate-455 tracking-wider mb-1">
               Admin Email
             </label>
             <div className="relative">
@@ -704,13 +704,13 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@example.com"
-                className="w-full bg-slate-950/80 border border-slate-800 text-white pl-10 pr-4 py-3 rounded-xl outline-none focus:border-indigo-500 text-sm font-mono"
+                className="w-full bg-slate-950/80 border border-slate-800 text-slate-100 pl-10 pr-4 py-3 rounded-xl outline-none focus:border-indigo-500 text-sm font-mono"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs uppercase font-mono font-bold text-slate-450 tracking-wider mb-1">
+            <label className="block text-xs uppercase font-mono font-bold text-slate-455 tracking-wider mb-1">
               Secure Key (Password)
             </label>
             <div className="relative">
@@ -721,7 +721,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-slate-950/80 border border-slate-800 text-white pl-10 pr-4 py-3 rounded-xl outline-none focus:border-indigo-500 text-sm font-mono"
+                className="w-full bg-slate-950/80 border border-slate-800 text-slate-100 pl-10 pr-4 py-3 rounded-xl outline-none focus:border-indigo-500 text-sm font-mono"
               />
             </div>
           </div>
@@ -1391,7 +1391,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-8 animate-fade-in">
           <div className="border-b border-slate-850 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h4 className="font-sans font-extrabold text-xl text-white">Cloudinary CDN Settings</h4>
+              <h4 className="font-sans font-extrabold text-xl text-slate-100">Cloudinary CDN Settings</h4>
               <p className="text-slate-400 text-xs font-mono mt-1">
                 Customize storage variables below for smooth background media streaming and layouts.
               </p>
@@ -1412,7 +1412,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                   <circle cx="56" cy="56" r="48" stroke="#6366f1" strokeWidth="8" fill="transparent" strokeDasharray="301.6" strokeDashoffset="0" strokeLinecap="round" />
                 </svg>
                 <div className="text-center z-10">
-                  <span className="block font-sans font-extrabold text-sm text-white">25.0 GB</span>
+                  <span className="block font-sans font-extrabold text-sm text-slate-100">25.0 GB</span>
                   <span className="block text-[8px] font-mono text-indigo-400 font-bold uppercase tracking-widest">Base Cap</span>
                 </div>
               </div>
@@ -1427,7 +1427,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                   <circle cx="56" cy="56" r="48" stroke="#f43f5e" strokeWidth="8" fill="transparent" strokeDasharray="301.6" strokeDashoffset={301.6 * (1 - 0.2568)} strokeLinecap="round" />
                 </svg>
                 <div className="text-center z-10">
-                  <span className="block font-sans font-extrabold text-sm text-white">6.42 GB</span>
+                  <span className="block font-sans font-extrabold text-sm text-slate-100">6.42 GB</span>
                   <span className="block text-[8px] font-mono text-rose-500 font-bold uppercase tracking-widest">25.68% USED</span>
                 </div>
               </div>
@@ -1442,7 +1442,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                   <circle cx="56" cy="56" r="48" stroke="#10b981" strokeWidth="8" fill="transparent" strokeDasharray="301.6" strokeDashoffset={301.6 * (1 - 0.7432)} strokeLinecap="round" />
                 </svg>
                 <div className="text-center z-10">
-                  <span className="block font-sans font-extrabold text-sm text-white">18.58 GB</span>
+                  <span className="block font-sans font-extrabold text-sm text-slate-100">18.58 GB</span>
                   <span className="block text-[8px] font-mono text-emerald-500 font-bold uppercase tracking-widest">74.32% FREE</span>
                 </div>
               </div>
@@ -1550,22 +1550,22 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
 
                   <ol className="list-decimal pl-4.5 space-y-2.5 text-slate-400 text-[11px] font-mono whitespace-normal text-left">
                     <li>
-                      <strong className="text-white">Cloudinary Dashboard</strong> এ লগইন করুন এবং বাম পাশের নিচে থাকা <strong className="text-indigo-400">Settings Gear (icon)</strong> এ ক্লিক করুন।
+                      <strong className="text-slate-100">Cloudinary Dashboard</strong> এ লগইন করুন এবং বাম পাশের নিচে থাকা <strong className="text-indigo-400">Settings Gear (icon)</strong> এ ক্লিক করুন।
                     </li>
                     <li>
-                      বাম পাশের ট্যাব থেকে <strong className="text-white">Upload</strong> সিলেক্ট করুন।
+                      বাম পাশের ট্যাব থেকে <strong className="text-slate-100">Upload</strong> সিলেক্ট করুন।
                     </li>
                     <li>
-                      একটু নিচে স্ক্রল করে <strong className="text-white">Upload presets</strong> সেকশন খুঁজুন এবং <strong className="text-indigo-400">"Add upload preset"</strong> বাটনে ক্লিক করুন।
+                      একটু নিচে স্ক্রল করে <strong className="text-slate-100">Upload presets</strong> সেকশন খুঁজুন এবং <strong className="text-indigo-400">"Add upload preset"</strong> বাটনে ক্লিক করুন।
                     </li>
                     <li>
-                      নতুন পেজে <strong className="text-white">Signing Mode</strong> ড্রপডাউনটি <strong className="text-rose-400 border border-rose-500/20 px-1 py-0.5 rounded bg-rose-500/5 font-sans font-bold">Unsigned</strong> এ পরিবর্তন করুন (এটা সবচেয়ে গুরুত্বপূর্ণ step!)।
+                      নতুন পেজে <strong className="text-slate-100">Signing Mode</strong> ড্রপডাউনটি <strong className="text-rose-400 border border-rose-500/20 px-1 py-0.5 rounded bg-rose-500/5 font-sans font-bold">Unsigned</strong> এ পরিবর্তন করুন (এটা সবচেয়ে গুরুত্বপূর্ণ step!)।
                     </li>
                     <li>
-                      সেখানে তৈরি হওয়া <strong className="text-white">Upload preset name</strong>-টি কপি করে নিন (যেমন: <code className="text-indigo-300">portfolio_preset</code>)।
+                      সেখানে তৈরি হওয়া <strong className="text-slate-100">Upload preset name</strong>-টি কপি করে নিন (যেমন: <code className="text-indigo-300">portfolio_preset</code>)।
                     </li>
                     <li>
-                      সবশেষে একদম উপরে ডান কোণায় থাকা <strong className="text-white">"Save" (হলুদ বাটন)</strong> এ ক্লিক করুন।
+                      সবশেষে একদম উপরে ডান কোণায় থাকা <strong className="text-slate-100">"Save" (হলুদ বাটন)</strong> এ ক্লিক করুন।
                     </li>
                     <li>
                       এখন আপনার Cloud Name এবং কপি করা Upload Preset Name-টি এখানে দিয়ে <strong className="text-indigo-400">Verify & Save Variables</strong> বাটনে চাপুন।
@@ -1587,7 +1587,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-8 animate-fade-in">
           <div className="border-b border-slate-850 pb-4 flex items-center justify-between">
             <div>
-              <h4 className="font-sans font-extrabold text-xl text-white">Live Calculation & Budget Control</h4>
+              <h4 className="font-sans font-extrabold text-xl text-slate-100">Live Calculation & Budget Control</h4>
               <p className="text-slate-400 text-xs font-mono mt-1">
                 Dynamically adjust baseline system build costs, multi-page layout rates, custom feature multipliers, and live user discount percentages.
               </p>

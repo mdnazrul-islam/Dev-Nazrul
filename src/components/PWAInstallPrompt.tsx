@@ -6,6 +6,7 @@ export default function PWAInstallPrompt() {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [isIOS, setIsIOS] = useState<boolean>(false);
   const [isStandalone, setIsStandalone] = useState<boolean>(false);
+  const [isIframe, setIsIframe] = useState<boolean>(false);
 
   useEffect(() => {
     // 1. Detect if the app is already running in standalone mode (installed as PWA)
@@ -26,7 +27,17 @@ export default function PWAInstallPrompt() {
       return; // No need to prompt if already installed!
     }
 
-    // 2. Identify if it is an iOS device
+    // 2. Identify if it is inside an iframe (like AI Studio preview pane)
+    const isIframeDetected = () => {
+      try {
+        return window.self !== window.top;
+      } catch {
+        return true;
+      }
+    };
+    setIsIframe(isIframeDetected());
+
+    // 3. Identify if it is an iOS device
     const checkIsIOS = () => {
       try {
         const userAgent = window.navigator.userAgent.toLowerCase();
@@ -39,28 +50,20 @@ export default function PWAInstallPrompt() {
     const iosDetected = checkIsIOS();
     setIsIOS(iosDetected);
 
-    // 3. Listen for Android/Chrome standard installation prompt
+    // 4. Listen for Android/Chrome standard installation prompt
     const handleBeforeInstallPrompt = (e: Event) => {
       // Prevent the default mini-infobar from appearing on mobile
       e.preventDefault();
       // Stash the event so it can be triggered later
       setDeferredPrompt(e);
-      
-      // Delay prompt appearance by 6 seconds for high-quality welcome pacing
-      const timer = setTimeout(() => {
-        setIsVisible(true);
-      }, 6000);
-
-      return () => clearTimeout(timer);
+      setIsVisible(true);
     };
 
-    // 4. Fallback: If it's an iOS device, show the instruction after 10 seconds (since iOS has no prompt event)
-    if (iosDetected) {
-      const iosTimer = setTimeout(() => {
-        setIsVisible(true);
-      }, 10000);
-      return () => clearTimeout(iosTimer);
-    }
+    // 5. Fallback: If in iframe or standard, show the guided install trigger after 3 seconds
+    const fallbackTimer = setTimeout(() => {
+      // If we are in an iframe or it hasn't fired yet, show the guide
+      setIsVisible(true);
+    }, 4000);
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
@@ -73,6 +76,7 @@ export default function PWAInstallPrompt() {
     window.addEventListener("appinstalled", handleAppInstalled);
 
     return () => {
+      clearTimeout(fallbackTimer);
       window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
       window.removeEventListener("appinstalled", handleAppInstalled);
     };
@@ -155,7 +159,24 @@ export default function PWAInstallPrompt() {
             </button>
           </div>
 
-          {isIOS ? (
+          {isIframe ? (
+            /* Inside AI Studio/Iframe guidance */
+            <div className="space-y-3">
+              <p className="text-xs text-slate-300 font-sans leading-relaxed">
+                ব্রাউজার সিকিউরিটি পলিসির কারণে আইফ্রেম (ডেভেলপমেন্ট প্রিভিউ) উইন্ডো থেকে সরাসরি ইনস্টলেশন ব্লক থাকে।
+              </p>
+              <div className="bg-slate-900/50 p-2.5 rounded-lg border border-slate-800/40 text-[11px] font-mono text-indigo-300 space-y-1">
+                <div className="flex items-center gap-2">
+                  <Share2 className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" />
+                  <span>১. উপরের ডানদিকের <b>'Open in new tab'</b> বাটনে ক্লিক করুন।</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Download className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" />
+                  <span>২. নতুন ট্যাবে খুলে গেলে এই ইনস্টল উইন্ডোটি থেকে যুক্ত করে নিন।</span>
+                </div>
+              </div>
+            </div>
+          ) : isIOS ? (
             /* iOS Custom Instruction Details */
             <div className="space-y-2 text-xs text-slate-300 font-sans leading-relaxed">
               <p>
