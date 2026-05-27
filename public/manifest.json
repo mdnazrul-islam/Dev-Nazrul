@@ -1,0 +1,29 @@
+{
+  "short_name": "Dev Nazrul",
+  "name": "Dev Nazrul",
+  "description": "Professional Fullstack Specialist Portfolio",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0d0e12",
+  "theme_color": "#0d0e12",
+  "display": "standalone",
+  "orientation": "portrait"
+}

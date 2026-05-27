@@ -11,23 +11,43 @@
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/logo.png" />
-    <link rel="apple-touch-icon" href="/logo.jpg" />
+    <link rel="apple-touch-icon" href="/logo.png" />
+
+    <!-- PWA Manifest & Meta -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#0d0e12" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Dev Nazrul" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Dev Nazrul | Fullstack Specialist" />
     <meta property="og:description" content="Professional Full-Stack Developer & Android Expert Portfolio. Featuring real-time Firebase integrations, custom web/mobile solutions, and high-performance applications." />
-    <meta property="og:image" content="/logo.jpg" />
+    <meta property="og:image" content="/logo.png" />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:title" content="Dev Nazrul | Fullstack Specialist" />
     <meta property="twitter:description" content="Professional Full-Stack Developer & Android Expert Portfolio. Featuring real-time Firebase integrations, custom web/mobile solutions, and high-performance applications." />
-    <meta property="twitter:image" content="/logo.jpg" />
+    <meta property="twitter:image" content="/logo.png" />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((reg) => {
+              console.log('ServiceWorker registered with scope:', reg.scope);
+            })
+            .catch((err) => {
+              console.error('ServiceWorker registration failed:', err);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
 

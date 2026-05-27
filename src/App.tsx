@@ -13,6 +13,7 @@ import WorkTimeline from "./components/WorkTimeline";
 import ServicesPricing from "./components/ServicesPricing";
 import Guestbook from "./components/Guestbook";
 import AIAssistant from "./components/AIAssistant";
+import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import { AVAILABLE_THEMES } from "./themes";
 import { Laptop, Briefcase, Phone, Settings, ShieldAlert, Cpu, Heart, Code, Sparkles, MapPin, Layers, Loader2, Github, Facebook, Linkedin, MessageCircle, Sun, Moon } from "lucide-react";
 
@@ -612,6 +613,9 @@ export default function App() {
 
       {/* Embedded Floating AI Advisor Expert Drawer */}
       <AIAssistant />
+
+      {/* Modern PWA Install Controller Banner */}
+      <PWAInstallPrompt />
 
     </div>
   );
