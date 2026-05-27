@@ -15,7 +15,7 @@ import Guestbook from "./components/Guestbook";
 import AIAssistant from "./components/AIAssistant";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import { AVAILABLE_THEMES } from "./themes";
-import { Laptop, Briefcase, Phone, Settings, ShieldAlert, Cpu, Heart, Code, Sparkles, MapPin, Layers, Loader2, Github, Facebook, Linkedin, MessageCircle, Sun, Moon } from "lucide-react";
+import { Laptop, Briefcase, Phone, Settings, ShieldAlert, Cpu, Heart, Code, Sparkles, MapPin, Layers, Loader2, Github, Facebook, Linkedin, MessageCircle, Sun, Moon, Search, X } from "lucide-react";
 
 export default function App() {
   const [currentView, setView] = useState<string>("home");
@@ -287,12 +287,18 @@ export default function App() {
     }
   };
 
-  // Selected Filter settings
+  // Selected Filter & Search settings
   const [galleryFilter, setGalleryFilter] = useState<"All" | "Web" | "App">("All");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredProjects = galleryFilter === "All" 
-    ? allProjects 
-    : allProjects.filter(p => p.category === galleryFilter);
+  const filteredProjects = allProjects.filter(p => {
+    const matchesFilter = galleryFilter === "All" || p.category === galleryFilter;
+    const matchesSearch = !searchQuery || 
+      p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      p.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (p.technologies && p.technologies.some(tech => tech.toLowerCase().includes(searchQuery.toLowerCase())));
+    return matchesFilter && matchesSearch;
+  });
 
   // Transition helper navigation overrides
   const handleExploreTrigger = () => {
@@ -471,31 +477,55 @@ export default function App() {
                   </p>
                 </div>
 
-                {/* Filters Toggle Header Bar */}
-                <div className="flex justify-center gap-1.5 p-1 bg-slate-900/60 border border-slate-800 rounded-xl max-w-sm mx-auto">
-                  {(["All", "Web", "App"] as const).map((filter) => (
-                    <button
-                      key={filter}
-                      id={`filter-tab-${filter}`}
-                      onClick={() => setGalleryFilter(filter)}
-                      className={`flex-1 py-2 rounded-lg text-xs font-mono font-bold uppercase transition-all tracking-wide cursor-pointer ${
-                        galleryFilter === filter
-                          ? "bg-indigo-600 text-white shadow"
-                          : "text-slate-450 hover:text-slate-200"
-                      }`}
-                    >
-                      {filter}
-                    </button>
-                  ))}
+                {/* Search & Filters Toggle Header Bar */}
+                <div className="max-w-2xl mx-auto flex flex-col sm:flex-row items-center gap-4 bg-slate-900/40 p-3 rounded-2xl border border-slate-800/80">
+                  <div className="w-full sm:w-auto flex justify-center gap-1.5 p-1 bg-slate-950 rounded-xl border border-slate-800 flex-shrink-0">
+                    {(["All", "Web", "App"] as const).map((filter) => (
+                      <button
+                        key={filter}
+                        id={`filter-tab-${filter}`}
+                        onClick={() => setGalleryFilter(filter)}
+                        className={`px-4 py-2 rounded-lg text-xs font-mono font-bold uppercase transition-all tracking-wide cursor-pointer ${
+                          galleryFilter === filter
+                            ? "bg-indigo-600 text-white shadow"
+                            : "text-slate-400 hover:text-slate-200"
+                        }`}
+                      >
+                        {filter}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Search Input Bar */}
+                  <div className="relative w-full">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
+                      <Search className="w-4 h-4 text-slate-500" />
+                    </span>
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="টপিক বা টেকনোলজি দিয়ে সার্চ করুন (যেমন: Next.js, Kotlin, Express)..."
+                      className="w-full bg-slate-950/80 border border-slate-805 text-slate-100 pl-10 pr-10 py-2.5 rounded-xl outline-none focus:border-indigo-500 hover:border-slate-800 text-xs font-sans transition-all placeholder-slate-500 text-left"
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery("")}
+                        className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-500 hover:text-slate-300 transition-colors"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Grid list display */}
                 {isLoading ? (
                   <div className="text-center py-20">
                     <Loader2 className="w-8 h-8 animate-spin text-indigo-400 mx-auto mb-2" />
-                    <p className="text-xs font-mono text-slate-450">Querying portfolio assets...</p>
+                    <p className="text-xs font-mono text-slate-455">Querying portfolio assets...</p>
                   </div>
-                ) : (
+                ) : filteredProjects.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
                     {filteredProjects.map((project) => (
                       <ProjectCard 
@@ -504,6 +534,17 @@ export default function App() {
                         onSelection={handleSelectProject} 
                       />
                     ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-16 bg-slate-950/40 border border-slate-900 rounded-2xl max-w-lg mx-auto p-6 space-y-3">
+                    <Search className="w-8 h-8 text-slate-600 mx-auto" />
+                    <p className="text-sm font-sans text-slate-400">আপনার খোঁজা কিওয়ার্ডের সাথে কোন প্রজেক্ট মেলেনি।</p>
+                    <button 
+                      onClick={() => { setSearchQuery(""); setGalleryFilter("All"); }} 
+                      className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-550 text-white font-mono text-xs rounded-xl transition-colors cursor-pointer"
+                    >
+                      রিসেট ফিল্টার
+                    </button>
                   </div>
                 )}
               </div>

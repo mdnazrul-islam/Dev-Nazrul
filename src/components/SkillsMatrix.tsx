@@ -15,7 +15,7 @@ interface SkillCategory {
 }
 
 export default function SkillsMatrix() {
-  const [activeTab, setActiveTab] = useState<string>("all");
+  const [activeTab, setActiveTab] = useState<string>("mobile");
 
   const categories: SkillCategory[] = [
     {

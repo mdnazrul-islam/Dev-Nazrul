@@ -23,7 +23,7 @@ import { uploadToCloudinary } from "../cloudinary";
 import { Project, Message, VersionLog } from "../types";
 import { AVAILABLE_THEMES } from "../themes";
 import { 
-  Lock, Mail, Key, ShieldAlert, Plus, Layers, Inbox, Settings, 
+  Lock, Mail, Key, ShieldAlert, Plus, Layers, Inbox, Settings, Smartphone,
   Trash2, Edit, Loader2, UploadCloud, CheckCircle, RefreshCcw, LogOut, Check, ChevronDown, Percent, CreditCard, Paintbrush
 } from "lucide-react";
 
@@ -87,6 +87,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
   const [dbSuccess, setDbSuccess] = useState("");
   const [dbError, setDbError] = useState("");
   const [adminDefaultTheme, setAdminDefaultTheme] = useState<string>("dark");
+  const [adminInstallerLink, setAdminInstallerLink] = useState<string>("");
 
   // Project Editing structure state
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -233,6 +234,17 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
         const fallbackTheme = localStorage.getItem("admin-selected-default-theme") || "dark";
         setAdminDefaultTheme(fallbackTheme);
       }
+
+      // 5. Fetch Custom App Installer Link
+      const installerDocRef = doc(db, "settings", "installer");
+      try {
+        const installerSnap = await getDoc(installerDocRef);
+        if (installerSnap.exists() && installerSnap.data().installerLink) {
+          setAdminInstallerLink(installerSnap.data().installerLink);
+        }
+      } catch (e) {
+        console.warn("Installer link settings retrieval skipped or unconfigured.");
+      }
     } catch (err: any) {
       console.error("Fetch Data Error:", err);
       // Reporting via strict standard FireStore handler
@@ -339,6 +351,31 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
       setAdminDefaultTheme(selectedTheme);
       setDbSuccess(`Theme saved locally in fallback cache successfully.`);
       setTimeout(() => setDbSuccess(""), 4500);
+    } finally {
+      setDbLoading(false);
+    }
+  };
+
+  // Saves global custom app installer link configuration to FireStore
+  const handleSaveInstallerLink = async () => {
+    setDbLoading(true);
+    setDbError("");
+    setDbSuccess("");
+    try {
+      const installerDocRef = doc(db, "settings", "installer");
+      await setDoc(installerDocRef, {
+        installerLink: adminInstallerLink,
+        updatedAt: serverTimestamp(),
+      });
+      setDbSuccess("App installer download URL updated successfully!");
+      setTimeout(() => setDbSuccess(""), 4000);
+    } catch (err: any) {
+      console.error("Installer settings write failed:", err);
+      try {
+        handleFirestoreError(err, OperationType.WRITE, "settings/installer");
+      } catch (processed) {
+        setDbError("Authorization restricted. Failed to update application installer configuration.");
+      }
     } finally {
       setDbLoading(false);
     }
@@ -1533,6 +1570,36 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                       )}
                     </button>
                   ))}
+                </div>
+              </div>
+
+              {/* App Installer Link settings */}
+              <div className="bg-slate-950/65 border border-slate-850 rounded-2xl p-5 sm:p-6 space-y-4 text-left">
+                <span className="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider text-indigo-400">
+                  <Smartphone className="w-4 h-4 text-indigo-400" />
+                  App Installer Link (অ্যাপ ডাউনলোড ও ইনস্টল লিংক)
+                </span>
+                
+                <p className="font-sans text-[11px] sm:text-xs text-slate-400 leading-normal">
+                  ভিজিটরদেরকে হোম স্ক্রিনে সরাসরি পিডব্লিউএ ইনস্টলেশনের পরিবর্তে যে কাস্টম ডাউনলোড বা প্লেস্টোর/এপিকে লিংক থেকে (Dev Nazrul) অ্যাপটি ইনস্টল করতে বলা হবে, তা এখান থেকে সেট করুন।
+                </p>
+
+                <div className="space-y-3">
+                  <input
+                    type="url"
+                    value={adminInstallerLink}
+                    onChange={(e) => setAdminInstallerLink(e.target.value)}
+                    placeholder="https://example.com/dev-nazrul.apk"
+                    className="w-full bg-slate-900 border border-slate-800 text-indigo-300 rounded-xl py-2.5 px-3.5 outline-none focus:border-indigo-505 text-xs font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSaveInstallerLink}
+                    disabled={dbLoading}
+                    className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold py-2 rounded-lg transition-all text-[11px] uppercase tracking-wider font-mono cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <span>Save Installer Link</span>
+                  </button>
                 </div>
               </div>
 
