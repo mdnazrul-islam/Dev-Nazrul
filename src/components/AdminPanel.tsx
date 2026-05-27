@@ -88,6 +88,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
   const [dbError, setDbError] = useState("");
   const [adminDefaultTheme, setAdminDefaultTheme] = useState<string>("dark");
   const [adminInstallerLink, setAdminInstallerLink] = useState<string>("");
+  const [adminAppIconUrl, setAdminAppIconUrl] = useState<string>("");
 
   // Project Editing structure state
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -235,12 +236,18 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
         setAdminDefaultTheme(fallbackTheme);
       }
 
-      // 5. Fetch Custom App Installer Link
+      // 5. Fetch Custom App Installer Link & Icon settings
       const installerDocRef = doc(db, "settings", "installer");
       try {
         const installerSnap = await getDoc(installerDocRef);
-        if (installerSnap.exists() && installerSnap.data().installerLink) {
-          setAdminInstallerLink(installerSnap.data().installerLink);
+        if (installerSnap.exists()) {
+          const data = installerSnap.data();
+          if (data.installerLink) {
+            setAdminInstallerLink(data.installerLink);
+          }
+          if (data.appIconUrl) {
+            setAdminAppIconUrl(data.appIconUrl);
+          }
         }
       } catch (e) {
         console.warn("Installer link settings retrieval skipped or unconfigured.");
@@ -365,9 +372,10 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
       const installerDocRef = doc(db, "settings", "installer");
       await setDoc(installerDocRef, {
         installerLink: adminInstallerLink,
+        appIconUrl: adminAppIconUrl,
         updatedAt: serverTimestamp(),
       });
-      setDbSuccess("App installer download URL updated successfully!");
+      setDbSuccess("App installer and icon settings updated successfully!");
       setTimeout(() => setDbSuccess(""), 4000);
     } catch (err: any) {
       console.error("Installer settings write failed:", err);
@@ -1573,32 +1581,49 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                 </div>
               </div>
 
-              {/* App Installer Link settings */}
+              {/* App Installer & Brand Logo settings in English */}
               <div className="bg-slate-950/65 border border-slate-850 rounded-2xl p-5 sm:p-6 space-y-4 text-left">
                 <span className="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider text-indigo-400">
                   <Smartphone className="w-4 h-4 text-indigo-400" />
-                  App Installer Link (অ্যাপ ডাউনলোড ও ইনস্টল লিংক)
+                  App Installer & Brand Configuration
                 </span>
                 
                 <p className="font-sans text-[11px] sm:text-xs text-slate-400 leading-normal">
-                  ভিজিটরদেরকে হোম স্ক্রিনে সরাসরি পিডব্লিউএ ইনস্টলেশনের পরিবর্তে যে কাস্টম ডাউনলোড বা প্লেস্টোর/এপিকে লিংক থেকে (Dev Nazrul) অ্যাপটি ইনস্টল করতে বলা হবে, তা এখান থেকে সেট করুন।
+                  Configure the mobile client direct installation link and customize your brand icon asset (PNG or WEBP). Updating this dynamic icon URL will automatically change the live browser tab favicon too.
                 </p>
 
-                <div className="space-y-3">
-                  <input
-                    type="url"
-                    value={adminInstallerLink}
-                    onChange={(e) => setAdminInstallerLink(e.target.value)}
-                    placeholder="https://example.com/dev-nazrul.apk"
-                    className="w-full bg-slate-900 border border-slate-800 text-indigo-300 rounded-xl py-2.5 px-3.5 outline-none focus:border-indigo-505 text-xs font-mono"
-                  />
+                <div className="space-y-4 pt-1">
+                  {/* PWA / APK Link */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-mono uppercase text-slate-400 block font-bold">App Installer URL (APK / Play Store Link)</label>
+                    <input
+                      type="url"
+                      value={adminInstallerLink}
+                      onChange={(e) => setAdminInstallerLink(e.target.value)}
+                      placeholder="https://example.com/dev-nazrul.apk"
+                      className="w-full bg-slate-900 border border-slate-800 text-indigo-300 rounded-xl py-2.5 px-3.5 outline-none focus:border-indigo-500 text-xs font-mono"
+                    />
+                  </div>
+
+                  {/* Icon URL */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-mono uppercase text-slate-400 block font-bold">App Icon & Website Favicon URL</label>
+                    <input
+                      type="url"
+                      value={adminAppIconUrl}
+                      onChange={(e) => setAdminAppIconUrl(e.target.value)}
+                      placeholder="https://example.com/assets/logo.png"
+                      className="w-full bg-slate-900 border border-slate-800 text-indigo-300 rounded-xl py-2.5 px-3.5 outline-none focus:border-indigo-500 text-xs font-mono"
+                    />
+                  </div>
+
                   <button
                     type="button"
                     onClick={handleSaveInstallerLink}
                     disabled={dbLoading}
-                    className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold py-2 rounded-lg transition-all text-[11px] uppercase tracking-wider font-mono cursor-pointer flex items-center justify-center gap-1.5"
+                    className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold py-2.5 rounded-xl transition-all text-[11px] uppercase tracking-wider font-mono cursor-pointer flex items-center justify-center gap-1.5 shadow-lg shadow-indigo-650/10"
                   >
-                    <span>Save Installer Link</span>
+                    <span>Save Brand & Installer Client</span>
                   </button>
                 </div>
               </div>

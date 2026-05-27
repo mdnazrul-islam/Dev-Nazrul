@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, ShieldAlert, Laptop, Briefcase, Phone, ChevronRight, Github, Facebook, Linkedin, MessageCircle, Landmark, Paintbrush, ChevronDown } from "lucide-react";
+import { Menu, X, ShieldAlert, Laptop, Briefcase, Phone, ChevronRight, Github, Facebook, Linkedin, MessageCircle, Landmark, Paintbrush, ChevronDown, Search } from "lucide-react";
 import StylishLogo from "./StylishLogo";
 import { AVAILABLE_THEMES } from "../themes";
 
@@ -10,11 +10,14 @@ interface NavbarProps {
   onLogout?: () => void;
   theme: string;
   onThemeChange: (newTheme: string) => void;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
 }
 
-export default function Navbar({ currentView, setView, isAdmin, onLogout, theme, onThemeChange }: NavbarProps) {
+export default function Navbar({ currentView, setView, isAdmin, onLogout, theme, onThemeChange, searchQuery, setSearchQuery }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [showThemeDropdown, setShowThemeDropdown] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const currentThemeConfig = AVAILABLE_THEMES.find(t => t.id === theme) || AVAILABLE_THEMES[0];
 
@@ -58,6 +61,51 @@ export default function Navbar({ currentView, setView, isAdmin, onLogout, theme,
                 </button>
               );
             })}
+
+            {/* Elegant Search Toggle (Desktop) Next to Menu Items */}
+            <div className="relative flex items-center mx-1.5 z-50">
+              <div className={`flex items-center gap-1.5 transition-all duration-300 overflow-hidden ${isSearchOpen ? "max-w-[200px] sm:max-w-[240px] opacity-100 mr-2" : "max-w-0 opacity-0 pointer-events-none"}`}>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    if (currentView !== "gallery") {
+                      setView("gallery");
+                    }
+                  }}
+                  id="navbar-search-input"
+                  placeholder="Search projects by tech/title..."
+                  className="w-full bg-slate-950 border border-slate-800 text-slate-100 pl-3 pr-8 py-1.5 rounded-lg text-xs outline-none focus:border-indigo-500 font-sans"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-2 text-slate-450 hover:text-slate-200 cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+              <button
+                onClick={() => {
+                  setIsSearchOpen(!isSearchOpen);
+                  if (!isSearchOpen) {
+                    if (currentView !== "gallery") {
+                      setView("gallery");
+                    }
+                    setTimeout(() => {
+                      document.getElementById("navbar-search-input")?.focus();
+                    }, 150);
+                  }
+                }}
+                className={`p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer ${isSearchOpen ? "bg-slate-800 text-indigo-400 border border-indigo-505/20" : ""}`}
+                title="Search projects"
+                id="desktop-search-trigger"
+              >
+                <Search className="w-4 h-4" />
+              </button>
+            </div>
 
             {/* Theme Dropdown Selector (Desktop) */}
             <div className="relative mx-1.5 z-50">
@@ -190,8 +238,45 @@ export default function Navbar({ currentView, setView, isAdmin, onLogout, theme,
             )}
           </div>
 
-          {/* Mobile hamburger menu */}
-          <div className="flex md:hidden items-center gap-2">
+          {/* Mobile hamburger menu with expanding localized search */}
+          <div className="flex md:hidden items-center gap-1.5">
+            {/* Elegant Search Toggle (Mobile) */}
+            <div className="relative flex items-center z-50">
+              <div className={`flex items-center gap-1 transition-all duration-300 overflow-hidden ${isSearchOpen ? "max-w-[135px] opacity-100 mr-1" : "max-w-0 opacity-0 pointer-events-none"}`}>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    if (currentView !== "gallery") {
+                      setView("gallery");
+                    }
+                  }}
+                  id="mobile-navbar-search-input"
+                  placeholder="Search..."
+                  className="w-full bg-slate-950 border border-slate-800 text-slate-100 px-2 py-1 rounded-lg text-xs outline-none focus:border-indigo-505 font-sans"
+                />
+              </div>
+              <button
+                onClick={() => {
+                  setIsSearchOpen(!isSearchOpen);
+                  if (!isSearchOpen) {
+                    if (currentView !== "gallery") {
+                      setView("gallery");
+                    }
+                    setTimeout(() => {
+                      document.getElementById("mobile-navbar-search-input")?.focus();
+                    }, 150);
+                  }
+                }}
+                className={`p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer ${isSearchOpen ? "text-indigo-400" : ""}`}
+                title="Search projects"
+                id="mobile-search-trigger"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+            </div>
+
             {isAdmin && (
               <span className="text-[10px] bg-emerald-500/15 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 font-mono">
                 Admin

@@ -59,6 +59,30 @@ export default function App() {
     fetchDefaultThemeSettings();
   }, []);
 
+  // Synchronize Brand Icon with Browser Favicon dynamically
+  useEffect(() => {
+    const fetchBrandIconSettings = async () => {
+      try {
+        const installerDocRef = doc(db, "settings", "installer");
+        const installerSnap = await getDoc(installerDocRef);
+        if (installerSnap.exists()) {
+          const data = installerSnap.data();
+          if (data.appIconUrl) {
+            // Update favicon link elements dynamically
+            const link = (document.querySelector("link[rel*='icon']") || document.createElement('link')) as HTMLLinkElement;
+            link.type = 'image/png';
+            link.rel = 'shortcut icon';
+            link.href = data.appIconUrl;
+            document.getElementsByTagName('head')[0].appendChild(link);
+          }
+        }
+      } catch (e) {
+        console.warn("Favicon settings retrieval skipped or unconfigured.");
+      }
+    };
+    fetchBrandIconSettings();
+  }, []);
+
   // Update HTML data-attribute when theme changes
   useEffect(() => {
     try {
@@ -361,6 +385,8 @@ export default function App() {
         }}
         theme={theme}
         onThemeChange={handleUserThemeChange}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
       />
 
       {/* Primary Routing Body */}
@@ -505,7 +531,7 @@ export default function App() {
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="টপিক বা টেকনোলজি দিয়ে সার্চ করুন (যেমন: Next.js, Kotlin, Express)..."
+                      placeholder="Search projects by tech, title or tags (e.g. Next.js, Kotlin, Express)..."
                       className="w-full bg-slate-950/80 border border-slate-805 text-slate-100 pl-10 pr-10 py-2.5 rounded-xl outline-none focus:border-indigo-500 hover:border-slate-800 text-xs font-sans transition-all placeholder-slate-500 text-left"
                     />
                     {searchQuery && (
@@ -527,7 +553,7 @@ export default function App() {
                   </div>
                 ) : filteredProjects.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
-                    {filteredProjects.map((project) => (
+                     {filteredProjects.map((project) => (
                       <ProjectCard 
                         key={project.id || project.title} 
                         project={project} 
@@ -538,12 +564,12 @@ export default function App() {
                 ) : (
                   <div className="text-center py-16 bg-slate-950/40 border border-slate-900 rounded-2xl max-w-lg mx-auto p-6 space-y-3">
                     <Search className="w-8 h-8 text-slate-600 mx-auto" />
-                    <p className="text-sm font-sans text-slate-400">আপনার খোঁজা কিওয়ার্ডের সাথে কোন প্রজেক্ট মেলেনি।</p>
+                    <p className="text-sm font-sans text-slate-400">No projects matched your search criteria.</p>
                     <button 
                       onClick={() => { setSearchQuery(""); setGalleryFilter("All"); }} 
                       className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-550 text-white font-mono text-xs rounded-xl transition-colors cursor-pointer"
                     >
-                      রিসেট ফিল্টার
+                      Reset Filters
                     </button>
                   </div>
                 )}
