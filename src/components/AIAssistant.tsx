@@ -303,7 +303,7 @@ export default function AIAssistant() {
               {/* Reset History */}
               <button 
                 onClick={handleReset}
-                className="text-slate-450 hover:text-white p-1 rounded-md hover:bg-slate-900 transition-all cursor-pointer"
+                className="text-slate-450 hover:text-slate-100 p-1 rounded-md hover:bg-slate-900 transition-all cursor-pointer"
                 title="Reset Conversation"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
@@ -311,7 +311,7 @@ export default function AIAssistant() {
               {/* Close Button */}
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-slate-450 hover:text-white p-1 rounded-md hover:bg-slate-900 transition-all cursor-pointer"
+                className="text-slate-450 hover:text-slate-100 p-1 rounded-md hover:bg-slate-900 transition-all cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -399,7 +399,7 @@ export default function AIAssistant() {
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Ask Dev Nazrul AI..."
               maxLength={400}
-              className="flex-grow bg-slate-900 border border-slate-800 focus:border-indigo-500 outline-none rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 font-sans"
+              className="flex-grow bg-slate-900 border border-slate-800 focus:border-indigo-500 outline-none rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 font-sans"
             />
             <button
               type="submit"

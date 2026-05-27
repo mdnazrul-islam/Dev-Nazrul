@@ -157,6 +157,7 @@
   --color-slate-455: var(--theme-text-secondary);
   
   --color-indigo-600: var(--theme-accent);
+  --color-indigo-650: var(--theme-accent);
   --color-indigo-500: var(--theme-accent);
   --color-indigo-400: var(--theme-text-secondary);
 }

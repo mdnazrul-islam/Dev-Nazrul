@@ -911,7 +911,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
                       </span>
                     </div>
 
-                    <h4 className="font-sans font-bold text-white text-base truncate mb-1">{proj.title}</h4>
+                    <h4 className="font-sans font-bold text-slate-100 text-base truncate mb-1">{proj.title}</h4>
                     <p className="font-sans text-xs text-slate-400 line-clamp-2 mb-4 leading-normal">{proj.description}</p>
                     
                     {/* Render tech array list */}
@@ -1025,7 +1025,7 @@ export default function AdminPanel({ onAdminStateChange }: AdminPanelProps) {
       {activeTab === "add" && (
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6">
           <div className="border-b border-slate-850 pb-4">
-            <h4 className="font-sans font-extrabold text-xl text-white">
+            <h4 className="font-sans font-extrabold text-xl text-slate-100">
               {editingProject ? `Modify Project: ${editingProject.title}` : "Publish New Portfolio Project"}
             </h4>
             <p className="text-slate-450 text-xs font-mono mt-1">

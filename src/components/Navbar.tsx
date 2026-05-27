@@ -50,7 +50,7 @@ export default function Navbar({ currentView, setView, isAdmin, onLogout, theme,
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     isActive
                       ? "bg-indigo-600/10 text-indigo-400 border border-indigo-500/20"
-                      : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                      : "text-slate-300 hover:bg-slate-800 hover:text-slate-100"
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -63,7 +63,7 @@ export default function Navbar({ currentView, setView, isAdmin, onLogout, theme,
             <div className="relative mx-1.5 z-50">
               <button
                 onClick={() => setShowThemeDropdown(!showThemeDropdown)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold uppercase bg-slate-800/60 hover:bg-slate-850 border border-slate-800 hover:border-indigo-500/25 text-slate-200 hover:text-white transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold uppercase bg-slate-800/60 hover:bg-slate-850 border border-slate-800 hover:border-indigo-500/25 text-slate-200 hover:text-slate-100 transition-all cursor-pointer"
                 title="Change Site Theme"
                 id="desktop-theme-dropdown-trigger"
               >
@@ -94,7 +94,7 @@ export default function Navbar({ currentView, setView, isAdmin, onLogout, theme,
                         className={`w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-left transition-all ${
                           theme === t.id 
                             ? "text-indigo-400 bg-slate-800/50" 
-                            : "text-slate-300 hover:text-white hover:bg-slate-800/40"
+                            : "text-slate-300 hover:text-slate-100 hover:bg-slate-800/40"
                         }`}
                       >
                         <div className="flex items-center gap-2">
@@ -200,7 +200,7 @@ export default function Navbar({ currentView, setView, isAdmin, onLogout, theme,
             <button
               onClick={() => setIsOpen(!isOpen)}
               id="mobile-menu-toggle"
-              className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+              className="p-2 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800"
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
